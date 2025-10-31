@@ -2,6 +2,7 @@
 
 <p>
   <img alt="License" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat-square">
+  <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/nomos/build.yml?branch=main&style=flat-square">
 </p>
 
 A modern, lightweight, and developer-first rule engine for Java and Spring Boot.
@@ -47,68 +48,63 @@ Add the `nomos-spring-boot-starter` dependency.
 
 **Gradle:**
 ```kotlin
-implementation("io.github.shxms.nomos:nomos-spring-boot-starter:0.0.1-SNAPSHOT")
+implementation("io.github.nomos:nomos-spring-boot-starter:0.0.1-SNAPSHOT")
 ```
 
-Maven:
-
-```XML
-
+**Maven:**
+```xml
 <dependency>
-    <groupId>com.yourcompany.nomos</groupId>
+    <groupId>io.github.nomos</groupId>
     <artifactId>nomos-spring-boot-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
-As a Standalone Library
-Add the nomos-core dependency.
+#### As a Standalone Library
 
-Gradle:
+Add the `nomos-core` dependency.
 
-```Kotlin
-implementation("com.yourcompany.nomos:nomos-core:0.0.1-SNAPSHOT")
+**Gradle:**
+```kotlin
+implementation("io.github.nomos:nomos-core:0.0.1-SNAPSHOT")
 ```
 
-Maven:
-
-```XML
+**Maven:**
+```xml
 <dependency>
-    <groupId>com.yourcompany.nomos</groupId>
+    <groupId>io.github.nomos</groupId>
     <artifactId>nomos-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
-⚙️ Quick Usage (Spring Boot)
-Define your rules in src/main/resources/rules/discount.yml:
 
-```YAML
+---
 
-- name: "10% VIP Discount"
-  priority: 100
-  conditions:
-    - fact: "user.type"
-      operator: "EQUAL"
-      value: "VIP"
-    - fact: "cart.total"
-      operator: "GREATER_THAN"
-      value: 100
-  actions:
-    - type: "SET_FACT"
-      target: "cart.discountPercent"
-      value: 10.0
+### ⚙️ Quick Usage (Spring Boot)
+
+Define your rules in `src/main/resources/rules/discount.yml`:
+
+```yaml
+rules:
+  - name: "VIP Discount"
+    priority: 100
+    when: "isVIP(user) && cart.total > 100"
+    then:
+      - discount.percent = 10
+      - discount.reason = "VIP Member"
+      - sendEmail(user.email, "You got 10% off!")
 ```
 
-Configure nomos in your application.properties:
+Configure nomos in your `application.properties`:
 
-Properties
-
+```properties
 # Scan for all .yml files in the 'rules/' directory
 nomos.rule-location=classpath:rules/
+```
+
 Inject and use the engine in your service:
 
-```Java
-
+```java
 @Service
 public class CheckoutService {
 
@@ -129,67 +125,18 @@ public class CheckoutService {
         Facts updatedFacts = ruleEngine.execute(facts);
 
         // 3. Apply changes
-        cart.setDiscountPercent(updatedFacts.get("cart.discountPercent"));
+        cart.setDiscountPercent(updatedFacts.get("discount.percent"));
         return cart;
     }
 }
 ```
-🤝 Contributing
-We welcome contributions! This is a new project, and we'd love your help. Please see our CONTRIBUTING.md file for details on how to get started.
-
-📜 License
-nomos is open-source software licensed under the Apache License 2.0.
-
 
 ---
 
-### 2. Your "Perfectionist's Guide" to Standards
+### 🤝 Contributing
 
-Here are the standards you should follow.
+We welcome contributions! This is a new project, and we'd love your help. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to get started.
 
-#### 1. Top-Level Project Files
+### 📜 License
 
-Your root `nomos/` directory should look professional. Besides the `README.md`, you must add:
-
-* **`LICENSE`:** This is non-negotiable. For a Java library aiming for enterprise use, the **Apache 2.0 License** is the standard. It's permissive and trusted. Just copy-paste the official text into this file.
-* **`CONTRIBUTING.md`:** A file that explains *how* others can help.
-    * How to set up the project.
-    * A link to the coding style (see below).
-    * The branching and PR process (e.g., "fork, branch, open PR").
-* **`CODE_OF_CONDUCT.md`:** This establishes a welcoming community. Use the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct.md) template.
-* **`.gitignore`:** Use a standard one. [GitHub's Java .gitignore template](https://github.com/github/gitignore/blob/main/Java.gitignore) is perfect. Also add `.gradle/` and `build/`.
-
-#### 2. Coding Style & Naming Conventions
-
-* **Coding Style:** **Do not invent your own.** Adopt a major one. The most respected and modern one for Java is the [**Google Java Style Guide**](https://google.github.io/styleguide/javaguide.html). It covers everything from file structure to naming.
-* **Naming Conventions (from the guide):**
-    * **Packages:** `lowercase.with.dots` (e.g., `com.yourcompany.nomos.core`, `com.yourcompany.nomos.engine`). **I recommend using your GitHub username if you don't have a company, e.g., `io.github.shamsuddeenks.nomos.core`**.
-    * **Classes/Interfaces:** `PascalCase` (e.g., `RuleEngine`, `Facts`).
-    * **Methods & Variables:** `camelCase` (e.g., `execute`, `updatedFacts`).
-    * **Constants:** `UPPER_SNAKE_CASE` (e.g., `DEFAULT_PRIORITY`).
-* **How to Enforce It (The "Perfection" part):**
-    * **`Spotless`:** Add the Spotless plugin to your root `build.gradle.kts`. It will **automatically reformat** all your code to match the Google style every time you build. It's "set it and forget it."
-    * **`.editorconfig`:** Create this file in your root to enforce basic whitespace and indentation rules in every IDE.
-
-#### 3. Git & GitHub Workflow
-
-* **Branching:** Use a simple **GitHub Flow**.
-    1.  `main` is your primary branch. It **must always be stable and deployable**.
-    2.  **Never** commit directly to `main`.
-    3.  Create new branches for *everything* (e.g., `feat/add-java-dsl`, `fix/yaml-parser-bug`, `docs/update-readme`).
-    4.  Open a **Pull Request (PR)** to merge your branch into `main`.
-* **Commit Messages:** This is key. Use [**Conventional Commits**](https://www.conventionalcommits.org/en/v1.0.0/). It's a simple prefix system that makes your history *perfectly readable* and allows for automatic changelog generation.
-    * `feat: Add rule indexing for faster performance`
-    * `fix: Correct null pointer in Fact parsing`
-    * `docs: Update README with new Java DSL examples`
-    * `style: Apply spotless formatting to core module`
-    * `refactor: Simplify RuleEngine execution loop`
-    * `test: Add unit tests for priority sorting`
-* **GitHub Actions (CI):** This is the final piece. Create a file at `.github/workflows/build.yml`. This simple file will:
-    1.  Automatically run `gradle clean build test` on every push to `main` and on every PR.
-    2.  This **proves** that your project is not broken.
-    3.  This is what powers the "Build: Passing" badge in your README, giving instant confidence.
-
-This is a comprehensive, professional-grade setup. It's a lot, but you asked for perfect!
-
-Your next step is to create these top-level files. Would you like me to provide the templates for `.gitignore`, `CONTRIBUTING.md`, and the GitHub Action workflow?
+nomos is open-source software licensed under the [Apache License 2.0](LICENSE).

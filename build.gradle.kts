@@ -1,27 +1,36 @@
 plugins {
-    `java-library` apply false
     id("io.spring.dependency-management") version "1.1.5" apply false
+    id("com.diffplug.spotless") version "6.25.0" apply false
 }
 
-// Configure all subprojects
 subprojects {
     apply(plugin = "java-library")
-    apply(plugin = "maven-publish") // Good to add for later
+    apply(plugin = "maven-publish")
+    apply(plugin = "com.diffplug.spotless")
 
-    group = "com.yourcompany.nomos" // Change this to your group ID
+    group = "io.github.shamsu07.nomos"
     version = "0.0.1-SNAPSHOT"
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 
     repositories {
         mavenCentral()
     }
 
-    // Configure testing
+    extensions.configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
+    }
+
+    extensions.configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        java {
+            googleJavaFormat("1.18.1")
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
     }
 }

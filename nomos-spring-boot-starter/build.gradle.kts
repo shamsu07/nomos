@@ -1,6 +1,7 @@
 plugins {
     `java-library`
-    id("io.spring.dependency-management") // Manages Spring Boot dependency versions
+    id("io.spring.dependency-management")
+    id("org.springframework.boot") version "3.2.5" apply false
 }
 
 // This tells Spring Boot what versions to use
