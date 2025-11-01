@@ -18,7 +18,7 @@ public final class Facts {
   }
 
   public Facts(Map<String, Object> data) {
-    this.data = data;
+    this.data = deepCopy(data);
   }
 
   /**
@@ -165,6 +165,21 @@ public final class Facts {
     }
 
     return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> deepCopy(Map<String, Object> source) {
+    Map<String, Object> copy = new HashMap<>();
+    for (Map.Entry<String, Object> entry : source.entrySet()) {
+      Object value = entry.getValue();
+      if (value instanceof Map) {
+        copy.put(entry.getKey(), deepCopy((Map<String, Object>) value));
+      } else {
+        copy.put(entry.getKey(), value);
+      }
+    }
+
+    return copy;
   }
 
   @Override
