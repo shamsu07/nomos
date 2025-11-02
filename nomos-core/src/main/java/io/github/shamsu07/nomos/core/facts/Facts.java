@@ -1,8 +1,11 @@
 package io.github.shamsu07.nomos.core.facts;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Immutable container for rule execution context. Supports nested property access via dto notation
@@ -12,6 +15,9 @@ import java.util.Objects;
 public final class Facts {
 
   private final Map<String, Object> data;
+
+  private static final Map<String, MethodHandle> methodHandleCache = new ConcurrentHashMap<>();
+  private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
   public Facts() {
     this.data = new HashMap<>();
@@ -125,37 +131,43 @@ public final class Facts {
     return getFieldValue(value, parts[1]);
   }
 
-  // Use reflection to access POJO fields
   private Object getFieldValue(Object obj, String fieldPath) {
     String[] parts = fieldPath.split("\\.", 2);
     String fieldName = parts[0];
 
-    try {
-      // Try getter method first (getField or isField)
-      String getterName = "get" + capitalize(fieldName);
-      Object value = obj.getClass().getMethod(getterName).invoke(obj);
+    String cachedKey = obj.getClass().getName() + "#" + fieldName;
+    MethodHandle handle = methodHandleCache.get(cachedKey);
 
+    if (handle == null) {
+      handle = findGetter(obj.getClass(), fieldName);
+      if (handle == null) {
+        return null;
+      }
+      methodHandleCache.put(cachedKey, handle);
+    }
+
+    try {
+      Object value = handle.invoke(obj);
       if (parts.length == 1) {
         return value;
       }
-
       return value != null ? getFieldValue(value, parts[1]) : null;
-    } catch (NoSuchMethodException e) {
-      // Try boolean getter
+    } catch (Throwable e) {
+      return null;
+    }
+  }
+
+  private MethodHandle findGetter(Class<?> clazz, String fieldName) {
+    try {
+      String getterName = "get" + capitalize(fieldName);
+      return lookup.unreflect(clazz.getMethod(getterName));
+    } catch (NoSuchMethodException | IllegalAccessException e) {
       try {
         String boolGetterName = "is" + capitalize(fieldName);
-        Object value = obj.getClass().getMethod(boolGetterName).invoke(obj);
-
-        if (parts.length == 1) {
-          return value;
-        }
-
-        return value != null ? getFieldValue(value, parts[1]) : null;
-      } catch (Exception ignored) {
+        return lookup.unreflect(clazz.getMethod(boolGetterName));
+      } catch (NoSuchMethodException | IllegalAccessException ex) {
         return null;
       }
-    } catch (Exception e) {
-      return null;
     }
   }
 
