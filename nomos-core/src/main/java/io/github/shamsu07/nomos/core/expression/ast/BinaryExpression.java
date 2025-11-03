@@ -66,7 +66,14 @@ public class BinaryExpression implements Expression {
 
   @SuppressWarnings("unchecked")
   private int compare(Object left, Object right) {
-    if (left instanceof Comparable && right instanceof Comparable) {
+    if (left instanceof Number && right instanceof Number) {
+      double leftVal = ((Number) left).doubleValue();
+      double rightVal = ((Number) right).doubleValue();
+      return Double.compare(leftVal, rightVal);
+    }
+    if (left instanceof Comparable
+        && right instanceof Comparable
+        && left.getClass().equals(right.getClass())) {
       return ((Comparable<Object>) left).compareTo(right);
     }
     throw new IllegalArgumentException(

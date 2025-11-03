@@ -1,6 +1,7 @@
 package io.github.shamsu07.nomos.core.expression.ast;
 
 import io.github.shamsu07.nomos.core.facts.Facts;
+import io.github.shamsu07.nomos.core.function.FunctionMetadata;
 import io.github.shamsu07.nomos.core.function.FunctionRegistry;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,23 @@ public final class FunctionCallExpression implements Expression {
       evaluatedArgs.add(arg.evaluate(facts, functionRegistry));
     }
 
-    // Invoke function
-    return functionRegistry.invoke(functionName, evaluatedArgs.toArray());
+    // Get function metadata to check if Facts parameter needed
+    FunctionMetadata metadata = functionRegistry.getFunction(functionName);
+
+    // Build arguments array - inject Facts if function expects it
+    Object[] invokeArgs;
+    if (metadata.hasFactsParameter()) {
+      invokeArgs = new Object[evaluatedArgs.size() + 1];
+      invokeArgs[0] = facts;
+      for (int i = 0; i < evaluatedArgs.size(); i++) {
+        invokeArgs[i + 1] = evaluatedArgs.get(i);
+      }
+    } else {
+      invokeArgs = evaluatedArgs.toArray();
+    }
+
+    // Invoke function with proper arguments
+    return functionRegistry.invoke(functionName, invokeArgs);
   }
 
   public String getFunctionName() {
