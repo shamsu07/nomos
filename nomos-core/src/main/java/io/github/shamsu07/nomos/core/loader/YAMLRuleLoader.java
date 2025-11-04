@@ -128,7 +128,11 @@ public final class YAMLRuleLoader {
               .name(name)
               .priority(priority)
               .when(whenExpression)
-              .when(facts -> (Boolean) evaluator.evaluate(whenExpression, facts));
+              .when(
+                  facts -> {
+                    Object result = evaluator.evaluate(whenExpression, facts);
+                    return Boolean.TRUE.equals(result);
+                  });
 
       // Parse and add actions
       for (String actionString : thenActions) {
