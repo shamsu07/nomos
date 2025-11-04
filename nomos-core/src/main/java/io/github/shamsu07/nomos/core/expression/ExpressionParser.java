@@ -44,7 +44,14 @@ public final class ExpressionParser {
    */
   public Expression parse() {
     try {
-      return expression();
+      Expression expr = expression();
+
+      // Ensure we consumed all tokens
+      if (!isAtEnd()) {
+        throw new ParseException("Unexpected tokens after expression", peek().getPosition());
+      }
+
+      return expr;
     } catch (Exception e) {
       throw new ParseException("Failed to parse expression: " + e.getMessage(), current, e);
     }
