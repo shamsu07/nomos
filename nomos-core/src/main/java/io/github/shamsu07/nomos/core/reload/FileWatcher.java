@@ -20,16 +20,24 @@ public final class FileWatcher implements AutoCloseable {
 
   private final WatchService watchService;
   private final Map<Path, Runnable> watchedFiles;
-  private final ExecutorService executor;
+  private final ExecutorService watchExecutor;
+  private final ExecutorService callbackExecutor;
   private final AtomicBoolean running;
 
   public FileWatcher() throws IOException {
     this.watchService = FileSystems.getDefault().newWatchService();
     this.watchedFiles = new ConcurrentHashMap<>();
-    this.executor =
+    this.watchExecutor =
         Executors.newSingleThreadExecutor(
             r -> {
               Thread t = new Thread(r, "nomos-file-watcher");
+              t.setDaemon(true);
+              return t;
+            });
+    this.callbackExecutor =
+        Executors.newCachedThreadPool(
+            r -> {
+              Thread t = new Thread(r, "nomos-callback");
               t.setDaemon(true);
               return t;
             });
@@ -62,7 +70,7 @@ public final class FileWatcher implements AutoCloseable {
 
     // Start watching if not already running
     if (running.compareAndSet(false, true)) {
-      executor.submit(this::watchLoop);
+      watchExecutor.submit(this::watchLoop);
     }
   }
 
@@ -80,7 +88,8 @@ public final class FileWatcher implements AutoCloseable {
   @Override
   public void close() {
     running.set(false);
-    executor.shutdown();
+    watchExecutor.shutdown();
+    callbackExecutor.shutdown();
     try {
       watchService.close();
     } catch (IOException e) {
@@ -113,7 +122,7 @@ public final class FileWatcher implements AutoCloseable {
           Runnable callback = watchedFiles.get(fullPath);
           if (callback != null) {
             // Invoke callback in separate thread to avoid blocking watch loop
-            executor.submit(
+            callbackExecutor.submit(
                 () -> {
                   try {
                     callback.run();
