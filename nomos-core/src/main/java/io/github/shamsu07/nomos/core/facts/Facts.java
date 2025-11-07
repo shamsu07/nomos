@@ -16,8 +16,34 @@ public final class Facts {
 
   private final Map<String, Object> data;
 
-  private static final Map<String, MethodHandle> methodHandleCache = new ConcurrentHashMap<>();
+  private static final Map<CacheKey, MethodHandle> methodHandleCache = new ConcurrentHashMap<>();
   private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
+  private static final Map<String, String[]> pathCache = new ConcurrentHashMap<>();
+
+  private static final class CacheKey {
+    private final Class<?> clazz;
+    private final String fieldName;
+    private final int hash;
+
+    CacheKey(Class<?> clazz, String fieldName) {
+      this.clazz = clazz;
+      this.fieldName = fieldName;
+      this.hash = 31 * clazz.hashCode() + fieldName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (!(obj instanceof CacheKey)) return false;
+      CacheKey that = (CacheKey) obj;
+      return clazz.equals(that.clazz) && fieldName.equals(that.fieldName);
+    }
+
+    @Override
+    public int hashCode() {
+      return hash;
+    }
+  }
 
   public Facts() {
     this.data = new HashMap<>();
@@ -98,7 +124,7 @@ public final class Facts {
 
   // Nested propery support - uses reflection for POJOs
   private void putNested(Map<String, Object> target, String path, Object value) {
-    String[] parts = path.split("\\.", 2);
+    String[] parts = pathCache.computeIfAbsent(path, k -> k.split("\\.", 2));
     String firstkey = parts[0];
 
     if (parts.length == 1) {
@@ -115,7 +141,7 @@ public final class Facts {
 
   @SuppressWarnings("unchecked")
   private Object getNested(Map<String, Object> source, String path) {
-    String[] parts = path.split("\\.", 2);
+    String[] parts = pathCache.computeIfAbsent(path, k -> k.split("\\.", 2));
     Object value = source.get(parts[0]);
 
     if (value == null || parts.length == 1) {
@@ -132,18 +158,18 @@ public final class Facts {
   }
 
   private Object getFieldValue(Object obj, String fieldPath) {
-    String[] parts = fieldPath.split("\\.", 2);
+    String[] parts = pathCache.computeIfAbsent(fieldPath, k -> k.split("\\.", 2));
     String fieldName = parts[0];
 
-    String cachedKey = obj.getClass().getName() + "#" + fieldName;
-    MethodHandle handle = methodHandleCache.get(cachedKey);
+    CacheKey cacheKey = new CacheKey(obj.getClass(), fieldName);
+    MethodHandle handle = methodHandleCache.get(cacheKey);
 
     if (handle == null) {
       handle = findGetter(obj.getClass(), fieldName);
       if (handle == null) {
         return null;
       }
-      methodHandleCache.put(cachedKey, handle);
+      methodHandleCache.put(cacheKey, handle);
     }
 
     try {
