@@ -17,6 +17,7 @@ public final class ActionMetadata {
   private final Class<?> returnType;
   private final boolean hasFactsParameter;
   private final boolean returnsVoid;
+  private final MethodHandle spreader;
 
   public ActionMetadata(
       String name,
@@ -30,6 +31,7 @@ public final class ActionMetadata {
     this.returnType = Objects.requireNonNull(returnType, "Return type cannot be null");
     this.hasFactsParameter = hasFactsParameter;
     this.returnsVoid = void.class.equals(returnType) || Void.class.equals(returnType);
+    this.spreader = methodHandle.asSpreader(Object[].class, parameterTypes.length);
   }
 
   public String getName() {
@@ -41,7 +43,11 @@ public final class ActionMetadata {
   }
 
   public Class<?>[] getParameterTypes() {
-    return Arrays.copyOf(parameterTypes, parameterTypes.length);
+    return parameterTypes;
+  }
+
+  public MethodHandle getSpreader() {
+    return spreader;
   }
 
   public Class<?> getReturnType() {

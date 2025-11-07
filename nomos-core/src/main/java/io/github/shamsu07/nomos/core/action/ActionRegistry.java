@@ -160,18 +160,8 @@ public final class ActionRegistry {
           fullArgs = args;
         }
 
-        // Validate argument count
-        int expectedCount = metadata.getParameterCount();
-        int actualCount = fullArgs.length;
-
-        if (expectedCount != actualCount) {
-          throw new IllegalArgumentException(
-              String.format(
-                  "Action '%s' expects %d arguments, got %d", name, expectedCount, actualCount));
-        }
-
-        // Invoke action
-        Object result = metadata.getMethodHandle().invokeWithArguments(fullArgs);
+        // Invoke action - validation done at registration
+        Object result = metadata.getSpreader().invoke(fullArgs);
 
         // Return Facts: either from result or unchanged
         if (metadata.returnsVoid()) {
