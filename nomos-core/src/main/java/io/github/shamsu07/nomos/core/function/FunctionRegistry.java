@@ -142,18 +142,7 @@ public final class FunctionRegistry {
     FunctionMetadata metadata = getFunction(name);
 
     try {
-      // Validate argument count
-      int expectedCount = metadata.getParameterCount();
-      int actualCount = args == null ? 0 : args.length;
-
-      if (expectedCount != actualCount) {
-        throw new IllegalArgumentException(
-            String.format(
-                "Function '%s' expects %d arguments, got %d", name, expectedCount, actualCount));
-      }
-
-      // Invoke via Methodhandle
-      return metadata.getMethodHandle().invokeWithArguments(args);
+      return metadata.getSpreader().invoke(args);
     } catch (Throwable t) {
       throw new RuntimeException(
           String.format("Error invoking function '%s': %s", name, t.getMessage()), t);

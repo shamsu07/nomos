@@ -16,6 +16,7 @@ public final class FunctionMetadata {
   private final Class<?>[] parameterTypes;
   private final Class<?> returnType;
   private final boolean hasFactsParameter;
+  private final MethodHandle spreader;
 
   public FunctionMetadata(
       String name,
@@ -28,6 +29,7 @@ public final class FunctionMetadata {
     this.parameterTypes = Objects.requireNonNull(parameterTypes, "Parameter types cannot be null");
     this.returnType = Objects.requireNonNull(returnType, "Return type cannot be null");
     this.hasFactsParameter = hasFactsParameter;
+    this.spreader = methodHandle.asSpreader(Object[].class, parameterTypes.length);
   }
 
   public String getName() {
@@ -39,11 +41,15 @@ public final class FunctionMetadata {
   }
 
   public Class<?>[] getParameterTypes() {
-    return Arrays.copyOf(parameterTypes, parameterTypes.length);
+    return parameterTypes;
   }
 
   public Class<?> getReturnType() {
     return returnType;
+  }
+
+  public MethodHandle getSpreader() {
+    return spreader;
   }
 
   public boolean hasFactsParameter() {
