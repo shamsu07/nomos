@@ -3,7 +3,6 @@ package io.github.shamsu07.nomos.core.expression.ast;
 import io.github.shamsu07.nomos.core.facts.Facts;
 import io.github.shamsu07.nomos.core.function.FunctionMetadata;
 import io.github.shamsu07.nomos.core.function.FunctionRegistry;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,10 +23,10 @@ public final class FunctionCallExpression implements Expression {
 
   @Override
   public Object evaluate(Facts facts, FunctionRegistry functionRegistry) {
-    // Evaluate all argument expressions
-    List<Object> evaluatedArgs = new ArrayList<>(arguments.size());
-    for (Expression arg : arguments) {
-      evaluatedArgs.add(arg.evaluate(facts, functionRegistry));
+    // Evaluate all argument expressions directly to array
+    Object[] evaluatedArgs = new Object[arguments.size()];
+    for (int i = 0; i < arguments.size(); i++) {
+      evaluatedArgs[i] = arguments.get(i).evaluate(facts, functionRegistry);
     }
 
     // Get function metadata to check if Facts parameter needed
@@ -36,13 +35,11 @@ public final class FunctionCallExpression implements Expression {
     // Build arguments array - inject Facts if function expects it
     Object[] invokeArgs;
     if (metadata.hasFactsParameter()) {
-      invokeArgs = new Object[evaluatedArgs.size() + 1];
+      invokeArgs = new Object[evaluatedArgs.length + 1];
       invokeArgs[0] = facts;
-      for (int i = 0; i < evaluatedArgs.size(); i++) {
-        invokeArgs[i + 1] = evaluatedArgs.get(i);
-      }
+      System.arraycopy(evaluatedArgs, 0, invokeArgs, 1, evaluatedArgs.length);
     } else {
-      invokeArgs = evaluatedArgs.toArray();
+      invokeArgs = evaluatedArgs;
     }
 
     // Invoke function with proper arguments
