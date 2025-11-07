@@ -18,7 +18,7 @@ dependencies {
     // Spring Boot dependencies
     api("org.springframework.boot:spring-boot-autoconfigure")
     api("org.springframework.boot:spring-boot-configuration-processor") // For @ConfigurationProperties
-
+    api("org.slf4j:slf4j-api")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
