@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("me.champeau.jmh") version "0.7.2"
 }
 
 dependencies {
@@ -10,4 +11,15 @@ dependencies {
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.3")
+    
+    // JMH
+    jmh("org.openjdk.jmh:jmh-core:1.37")
+    jmh("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+}
+
+jmh {
+    warmupIterations.set(3)
+    iterations.set(5)
+    fork.set(2)
+    jvmArgs.addAll("-Xmx512m", "-Xms512m")
 }
