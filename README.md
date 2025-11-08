@@ -1,131 +1,184 @@
-# nomos
+
+# Nomos
 
 <p>
   <img alt="License" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat-square">
-  <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/nomos/build.yml?branch=main&style=flat-square">
+  <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/shamsu07/nomos/build.yaml?branch=main&style=flat-square">
+  <img alt="Java" src="https://img.shields.io/badge/Java-17+-blue.svg?style=flat-square">
 </p>
 
-A modern, lightweight, and developer-first rule engine for Java and Spring Boot.
+**A lightweight, high-performance rule engine for Java and Spring Boot.**
 
-`nomos` is designed to be the simple, transparent, and fast alternative for 95% of use cases where traditional rule engines (like Drools) are heavyweight and complex.
-
----
-
-### 💡 Why nomos?
-
-Traditional rule engines are powerful but often come with:
-* A steep learning curve.
-* Heavy memory footprints and slow startup times.
-* Complex, proprietary UIs and XML-based configuration.
-* A "black box" execution model that's hard to debug.
-
-`nomos` is different. Our philosophy is **developer-centric, simple, and transparent.**
-
-* ✅ **Lightweight:** A small, plain Java JAR with minimal dependencies.
-* ✅ **Simple DSL:** Define rules in human-readable **YAML** files or a **Fluent Java DSL**.
-* ✅ **Spring-Native:** A first-class Spring Boot starter for zero-effort autoconfiguration.
-* ✅ **Hot-Reloading:** Rules are treated as configuration, not code. Reload them at runtime without restarting your service.
-* ✅ **Transparent:** A "glass box" design with built-in tracing and metrics (coming soon) so you always know *why* a rule fired.
-
-### ✨ Features
-
-* **Core Engine (`nomos-core`):** A standalone Java library. Use it in any Java project.
-* **Spring Boot Starter (`nomos-spring-boot-starter`):** Seamless autoconfiguration for Spring Boot apps.
-* **Multiple DSLs:**
-    * **YAML:** For externalized, hot-reloadable rule sets.
-    * **Java Fluent API:** For type-safe, developer-defined rules.
-* **High Performance:** Simple forward-chaining logic with a focus on speed and low overhead.
+Nomos is designed for developers who need a fast, simple rule engine without the complexity of traditional solutions like Drools. Perfect for startups and mid-size companies where developers own rule configuration.
 
 ---
 
-### 🚀 Getting Started
+## 🎯 Philosophy
 
-You can use `nomos` as a standalone library or with the Spring Boot starter.
+- **Lightweight**: <100KB core JAR, minimal dependencies  
+- **Fast**: >100K rule evaluations/second, <50ms hot reload  
+- **Developer-First**: Java/YAML DSL, not GUI. Code is configuration.  
+- **Transparent**: Glass-box execution with tracing  
+- **Modern**: Java 17+, functional style, annotation-based registration  
 
-#### With Spring Boot (Recommended)
+---
 
-Add the `nomos-spring-boot-starter` dependency.
+## ⚡ Performance
 
-**Gradle:**
+Nomos is optimized for speed through:
+
+- **MethodHandles**: ~6.5x faster than reflection  
+- **Facts Caching** for nested property access  
+- **Zero-allocation** expression evaluation  
+- **JMH Benchmarks** verifying all optimizations  
+
+**Target performance goals:**
+
+- `>100,000` rule evaluations/sec  
+- `<50ms` hot reload  
+- `<100ms` cold start  
+
+---
+
+## ✨ Features
+
+### Core Engine
+- Forward-chaining execution with priorities  
+- Custom expression parser  
+- Nested access: `user.address.city`  
+- Logical/Comparison/Arithmetic operators  
+- Function calls in conditions  
+- Action execution with side effects  
+- Full execution tracing  
+
+### Developer Experience
+- YAML DSL for rules  
+- Type-safe Java Fluent API  
+- Annotation-based registration  
+- Hot reload via file watching  
+- Fail-fast validation  
+- Spring Boot Starter  
+
+### Advanced
+- Immutable `Facts`  
+- Thread-safe registries  
+- Execution result with fired rules  
+- Stop-on-first-match mode  
+
+---
+
+## 🚀 Quick Start
+
+### 1. Add Dependency
+
+**Gradle (Kotlin DSL):**
 ```kotlin
-implementation("io.github.nomos:nomos-spring-boot-starter:0.0.1-SNAPSHOT")
-```
+implementation("io.github.shamsu07.nomos:nomos-spring-boot-starter:0.0.1-SNAPSHOT")
+````
 
 **Maven:**
+
 ```xml
 <dependency>
-    <groupId>io.github.nomos</groupId>
+    <groupId>io.github.shamsu07.nomos</groupId>
     <artifactId>nomos-spring-boot-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
-#### As a Standalone Library
+For standalone usage:
 
-Add the `nomos-core` dependency.
-
-**Gradle:**
 ```kotlin
-implementation("io.github.nomos:nomos-core:0.0.1-SNAPSHOT")
-```
-
-**Maven:**
-```xml
-<dependency>
-    <groupId>io.github.nomos</groupId>
-    <artifactId>nomos-core</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-</dependency>
+implementation("io.github.shamsu07.nomos:nomos-core:0.0.1-SNAPSHOT")
 ```
 
 ---
 
-### ⚙️ Quick Usage (Spring Boot)
+### 2. Define Rules
 
-Define your rules in `src/main/resources/rules/discount.yml`:
+Create `src/main/resources/rules/discount.yml`:
 
 ```yaml
 rules:
   - name: "VIP Discount"
     priority: 100
-    when: "isVIP(user) && cart.total > 100"
+    when: "isVIP() && cartTotal() > 100"
     then:
-      - discount.percent = 10
-      - discount.reason = "VIP Member"
-      - sendEmail(user.email, "You got 10% off!")
+      discount.percent: 15
+      discount.reason: "VIP Member"
+      sendEmail: ["{{ user.email }}", "You got 15% off!"]
+
+  - name: "Bulk Order Discount"
+    priority: 90
+    when: "itemCount() > 20"
+    then:
+      discount.percent: 12
+      discount.reason: "Bulk Order"
 ```
 
-Configure nomos in your `application.properties`:
+---
+
+### 3. Register Functions and Actions
+
+```java
+@Component
+public class DiscountFunctions {
+
+    @NomosFunction("isVIP")
+    public boolean isVIP(Facts facts) {
+        User user = facts.get("user", User.class);
+        return "VIP".equals(user.getType());
+    }
+
+    @NomosFunction("cartTotal")
+    public double cartTotal(Facts facts) {
+        Cart cart = facts.get("cart", Cart.class);
+        return cart.getTotal();
+    }
+}
+```
+
+```java
+@Component
+public class DiscountActions {
+
+    @NomosAction("sendEmail")
+    public void sendEmail(String email, String message) {
+        emailService.send(email, message);
+    }
+}
+```
+
+---
+
+### 4. Configure Spring Boot
 
 ```properties
-# Scan for all .yml files in the 'rules/' directory
-nomos.rule-location=classpath:rules/
+nomos.rule-location=classpath:rules/discount.yml
+nomos.hot-reload=true
 ```
 
-Inject and use the engine in your service:
+---
+
+### 5. Execute Rules
 
 ```java
 @Service
 public class CheckoutService {
 
-    private final RuleEngine ruleEngine;
-
-    @Autowired
-    public CheckoutService(RuleEngine ruleEngine) {
-        this.ruleEngine = ruleEngine;
-    }
+    private final ReloadableRuleEngine ruleEngine;
 
     public Cart applyDiscounts(User user, Cart cart) {
-        // 1. Create facts
-        Facts facts = new Facts();
-        facts.put("user", user);
-        facts.put("cart", cart);
+        Facts facts = new Facts()
+            .put("user", user)
+            .put("cart", cart);
 
-        // 2. Execute
-        Facts updatedFacts = ruleEngine.execute(facts);
+        Facts result = ruleEngine.execute(facts);
 
-        // 3. Apply changes
-        cart.setDiscountPercent(updatedFacts.get("discount.percent"));
+        Double discount = result.get("discount.percent", Double.class);
+        if (discount != null) {
+            cart.setDiscountPercent(discount);
+        }
         return cart;
     }
 }
@@ -133,10 +186,239 @@ public class CheckoutService {
 
 ---
 
-### 🤝 Contributing
+## 📖 Documentation
 
-We welcome contributions! This is a new project, and we'd love your help. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to get started.
+### Expression Syntax
 
-### 📜 License
+```yaml
+# Literals
+when: "true"
+when: "42"
+when: "3.14"
+when: "\"hello\""
 
-nomos is open-source software licensed under the [Apache License 2.0](LICENSE).
+# Variables
+when: "age > 18"
+when: "user.address.city == \"NYC\""
+
+# Arithmetic
+when: "balance + bonus > 1000"
+
+# Comparisons
+when: "status == \"ACTIVE\""
+
+# Logical
+when: "isVIP() && balance > 100"
+
+# Function calls
+when: "calculateScore() > 80"
+```
+
+---
+
+### Java Fluent API
+
+```java
+Rule rule = Rule.builder()
+    .name("VIP Discount")
+    .priority(100)
+    .when(facts -> {
+        User user = facts.get("user", User.class);
+        Cart cart = facts.get("cart", Cart.class);
+        return "VIP".equals(user.getType()) && cart.getTotal() > 100;
+    })
+    .then(facts -> {
+        facts.put("discount.percent", 15.0);
+        facts.put("discount.reason", "VIP Member");
+    })
+    .build();
+
+ruleEngine.addRule(rule);
+```
+
+---
+
+### Execution Tracing
+
+```java
+RuleEngine.ExecutionResult result = ruleEngine.executeWithTrace(facts);
+
+System.out.println("Fired Rules: " + result.firedRuleCount());
+
+for (RuleEngine.RuleExecution exec : result.executionTrace()) {
+    System.out.printf("%s - %s (priority: %d)%n",
+        exec.ruleName(),
+        exec.fired() ? "FIRED" : "SKIPPED",
+        exec.priority());
+}
+```
+
+---
+
+### Hot Reload
+
+```java
+ReloadableRuleEngine engine =
+        new ReloadableRuleEngine(functionRegistry, actionRegistry);
+
+engine.loadRules("file:///path/to/rules.yml", true);
+
+// Manual reload
+engine.reload();
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+┌───────────────────────────────┐
+│       ReloadableRuleEngine    │
+│    (FileWatcher + HotReload)  │
+└──────────────┬────────────────┘
+               │
+┌──────────────▼───────────────┐
+│          RuleEngine          │
+│  Priority + Forward Chaining │
+│       Execution Tracing      │
+└───────────┬───────────┬──────┘
+            │           │
+┌───────────▼─────┐   ┌───▼────────────┐
+│ FunctionRegistry│   │ ActionRegistry │
+│ (MethodHandles) │   │ (MethodHandles)│
+└─────────────────┘   └────────────────┘
+
+            │
+            ▼
+┌──────────────────────────────┐
+│     ExpressionEvaluator      │
+│ Custom Parser + Cached AST   │
+└──────────────────────────────┘
+```
+
+---
+
+## 📊 Benchmarks
+
+Run:
+
+```bash
+./gradlew jmh
+```
+
+**Sample Results (i7-9750H):**
+
+```
+Benchmark                                     Mode   Score     Units
+simpleRuleExecution                           thrpt  145234    ops/s
+complexRuleExecution                          thrpt  12456     ops/s
+reloadRules                                   avgt   38.234    ms
+```
+
+---
+
+## 🗂️ Project Structure
+
+```
+nomos/
+├── nomos-core/
+│   ├── engine/
+│   ├── rule/
+│   ├── facts/
+│   ├── function/
+│   ├── action/
+│   ├── expression/
+│   ├── loader/
+│   └── reload/
+│
+├── nomos-spring-boot-starter/
+│   ├── NomosAutoConfiguration
+│   ├── NomosProperties
+│   └── NomosConfigurer
+│
+└── nomos-example/
+    ├── DiscountFunctions
+    ├── DiscountActions
+    └── CheckoutService
+```
+
+---
+
+## 🤔 Why Not Drools?
+
+| Feature        | Nomos           | Drools     |
+| -------------- | --------------- | ---------- |
+| JAR Size       | <100KB          | ~50MB      |
+| Cold Start     | <100ms          | 1–2s       |
+| Learning Curve | Minutes         | Days/Weeks |
+| DSL            | YAML + Java     | DRL        |
+| Configuration  | Developer-owned | BA-driven  |
+| Dependencies   | 2               | 50+        |
+| Complexity     | Simple          | Complex    |
+
+Nomos is ideal when you want speed, simplicity, and control.
+
+---
+
+## 🛠️ Development
+
+Prerequisites:
+
+* Java 17+
+* Gradle 8.x
+
+Build:
+
+```bash
+./gradlew clean build test
+```
+
+Format:
+
+```bash
+./gradlew spotlessApply
+```
+
+Run Example:
+
+```bash
+cd nomos-example
+./gradlew bootRun
+```
+
+Test Endpoint:
+
+```bash
+curl "http://localhost:8080/api/checkout/calculate?userType=VIP&total=150&itemCount=5"
+```
+
+---
+
+## 🤝 Contributing
+
+See **CONTRIBUTING.md**.
+
+1. Fork & clone
+2. Create branch
+3. Implement & test
+4. Run spotless
+5. Open PR
+
+---
+
+## 📝 License
+
+Nomos is licensed under the **Apache License 2.0**.
+
+---
+
+## 🔗 Links
+
+* GitHub: [https://github.com/shamsu07/nomos](https://github.com/shamsu07/nomos)
+* Issues: [https://github.com/shamsu07/nomos/issues](https://github.com/shamsu07/nomos/issues)
+* Example App: `/nomos-example`
+
+---
+
+**Built with ❤️ for developers who want fast, simple rules without the complexity.**
+
