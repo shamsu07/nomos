@@ -1,15 +1,35 @@
 
-# Nomos
+# Nomos Rule Engine
 
-<p>
-  <img alt="License" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat-square">
-  <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/shamsu07/nomos/build.yaml?branch=main&style=flat-square">
-  <img alt="Java" src="https://img.shields.io/badge/Java-17+-blue.svg?style=flat-square">
-</p>
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.shamsu07/nomos-core.svg)](https://central.sonatype.com/artifact/io.github.shamsu07/nomos-core)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **A lightweight, high-performance rule engine for Java and Spring Boot.**
 
 Nomos is designed for developers who need a fast, simple rule engine without the complexity of traditional solutions like Drools. Perfect for startups and mid-size companies where developers own rule configuration.
+
+---
+
+## Installation
+
+### Maven
+```xml
+
+    io.github.shamsu07
+    nomos-core
+    0.0.1
+
+```
+
+### Gradle
+```kotlin
+implementation("io.github.shamsu07:nomos-core:0.0.1")
+```
+
+### Spring Boot Starter
+```kotlin
+implementation("io.github.shamsu07:nomos-spring-boot-starter:0.0.1")
+```
 
 ---
 

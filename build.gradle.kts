@@ -4,7 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.5" apply false
 }
 group = "io.github.shamsu07"
-version = "0.0.1"
+version = "0.0.2-SNAPSHOT"
 
 allprojects {
     group = rootProject.group
