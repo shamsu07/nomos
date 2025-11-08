@@ -15,9 +15,11 @@ Nomos is designed for developers who need a fast, simple rule engine without the
 ### Maven
 ```xml
 
-    io.github.shamsu07
-    nomos-core
-    0.0.1
+<dependency>
+    <groupId>io.github.shamsu07</groupId>
+    <artifactId>nomos-core</artifactId>
+    <version>0.0.1</version>
+</dependency>
 
 ```
 
@@ -441,4 +443,5 @@ Nomos is licensed under the **Apache License 2.0**.
 ---
 
 **Built with ❤️ for developers who want fast, simple rules without the complexity.**
+
 
