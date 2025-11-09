@@ -6,27 +6,16 @@ repo_url: https://github.com/shamsu07/nomos
 edit_uri: "" # Hides the "Edit on GitHub" button
 
 # Theme & Branding (Based on your logo)
+# Theme & Branding (Based on your new palette)
 theme:
   name: material
   logo: assets/nomos.png
   favicon: assets/nomos.png
   palette:
-    # Light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: deep-orange  # Matches your logo color
-      accent: blue
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: deep-orange  # Matches your logo color
-      accent: blue
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+    # We are only defining one, light theme.
+    scheme: default
+    primary: orange  # Base color, will be overridden to #FF4100
+    accent: blue
   font:
     text: Roboto
     code: Fira Code
@@ -38,7 +27,7 @@ theme:
     - content.code.annotate
     - content.code.copy
 
-# Custom CSS for logo background color
+# Custom CSS for your new brand colors
 extra_css:
   - stylesheets/extra.css
 
