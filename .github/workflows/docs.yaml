@@ -1,0 +1,28 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to main
+
+permissions:
+  contents: write # Allow action to write to gh-pages branch
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs-material
+
+      - name: Deploy
+        run: mkdocs gh-deploy --force

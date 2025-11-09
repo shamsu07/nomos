@@ -1,0 +1,34 @@
+rules:
+  - name: "VIP Discount"
+    priority: 100
+    when: "isVIP() && cartTotal() > 100"
+    then:
+      - discount.percent = 15
+      - discount.reason = "VIP Member"
+      - logDiscount("VIP Member", 15)
+      - sendEmail(user.email, "You got 15% off as a VIP!")
+
+  - name: "Premium Discount"
+    priority: 90
+    when: "isPremium() && cartTotal() > 50"
+    then:
+      - discount.percent = 10
+      - discount.reason = "Premium Member"
+      - logDiscount("Premium Member", 10)
+
+  - name: "Bulk Order Discount"
+    priority: 80
+    when: "itemCount() > 20"
+    then:
+      - discount.percent = 12
+      - discount.reason = "Bulk Order"
+      - logDiscount("Bulk Order", 12)
+      - trackMetric("bulk_orders", 1)
+
+  - name: "First Time Buyer"
+    priority: 70
+    when: "user.orderCount == 0 && cartTotal() > 30"
+    then:
+      - discount.percent = 5
+      - discount.reason = "First Time Buyer"
+      - logDiscount("First Time Buyer", 5)
