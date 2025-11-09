@@ -1,0 +1,14 @@
+/* Match logo's background color */
+body {
+  background-color: #FDFBF7; /* A light cream/off-white */
+}
+
+/* Adjust card/code backgrounds for the new base color */
+.md-typeset .admonition,
+.md-typeset details,
+.md-tabs__list,
+.md-code__inner,
+.md-code__scrollwrap,
+code {
+  background-color: #FBF9F5; /* A slightly darker cream */
+}
