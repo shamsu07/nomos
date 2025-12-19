@@ -24,14 +24,28 @@ public class BinaryExpression implements Expression {
 
   @Override
   public Object evaluate(Facts facts, FunctionRegistry functionRegistry) {
+    // Short-circuit evaluation for logical operators
+    if (operator == TokenType.AND) {
+      Object leftValue = left.evaluate(facts, functionRegistry);
+      if (!toBoolean(leftValue)) {
+        return false;
+      }
+      return toBoolean(right.evaluate(facts, functionRegistry));
+    }
+
+    if (operator == TokenType.OR) {
+      Object leftValue = left.evaluate(facts, functionRegistry);
+      if (toBoolean(leftValue)) {
+        return true;
+      }
+      return toBoolean(right.evaluate(facts, functionRegistry));
+    }
+
+    // For all other operators, evaluate both sides
     Object leftValue = left.evaluate(facts, functionRegistry);
     Object rightValue = right.evaluate(facts, functionRegistry);
 
     switch (operator) {
-      case AND:
-        return toBoolean(leftValue) && toBoolean(rightValue);
-      case OR:
-        return toBoolean(leftValue) || toBoolean(rightValue);
       case EQUAL:
         return Objects.equals(leftValue, rightValue);
       case NOT_EQUAL:

@@ -353,4 +353,60 @@ class BinaryExpressionTest {
     Object result = outer.evaluate(new Facts(), new FunctionRegistry());
     assertEquals(20.0, result);
   }
+
+  @Test
+  void should_shortCircuitAnd_when_leftIsFalse() {
+    // Create an expression that would throw if evaluated
+    Expression throwingExpr =
+        new Expression() {
+          @Override
+          public Object evaluate(Facts facts, FunctionRegistry registry) {
+            throw new RuntimeException("Right side should not be evaluated");
+          }
+        };
+
+    BinaryExpression expr =
+        new BinaryExpression(new LiteralExpression(false), TokenType.AND, throwingExpr);
+
+    // Should return false without evaluating right side
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(false, result);
+  }
+
+  @Test
+  void should_evaluateRightSideOfAnd_when_leftIsTrue() {
+    BinaryExpression expr =
+        new BinaryExpression(
+            new LiteralExpression(true), TokenType.AND, new LiteralExpression(false));
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(false, result);
+  }
+
+  @Test
+  void should_shortCircuitOr_when_leftIsTrue() {
+    // Create an expression that would throw if evaluated
+    Expression throwingExpr =
+        new Expression() {
+          @Override
+          public Object evaluate(Facts facts, FunctionRegistry registry) {
+            throw new RuntimeException("Right side should not be evaluated");
+          }
+        };
+
+    BinaryExpression expr =
+        new BinaryExpression(new LiteralExpression(true), TokenType.OR, throwingExpr);
+
+    // Should return true without evaluating right side
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(true, result);
+  }
+
+  @Test
+  void should_evaluateRightSideOfOr_when_leftIsFalse() {
+    BinaryExpression expr =
+        new BinaryExpression(
+            new LiteralExpression(false), TokenType.OR, new LiteralExpression(true));
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(true, result);
+  }
 }

@@ -72,6 +72,7 @@ class RuleEngineTest {
     assertEquals("HL", result.get("order"));
   }
 
+  @Test
   void should_stopAfterFirstRule_when_stopOnFirstEnabled() {
     RuleEngine stopEngine = new RuleEngine(true);
 
