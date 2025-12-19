@@ -30,7 +30,7 @@ public class NomosAutoConfiguration {
     return new ActionRegistry();
   }
 
-  @Bean
+  @Bean(destroyMethod = "close")
   @ConditionalOnMissingBean
   public ReloadableRuleEngine ruleEngine(
       FunctionRegistry functionRegistry,

@@ -109,16 +109,19 @@ public final class ReloadableRuleEngine implements AutoCloseable {
 
       long durationMs = (System.nanoTime() - startTime) / 1_000_000;
 
-      // Notify listener
-      if (reloadListener != null) {
-        reloadListener.onReloadSuccess(rules.size(), durationMs);
+      // Notify listener (capture reference to avoid race condition)
+      ReloadListener listener = this.reloadListener;
+      if (listener != null) {
+        listener.onReloadSuccess(rules.size(), durationMs);
       }
 
     } catch (Exception e) {
       long durationMs = (System.nanoTime() - startTime) / 1_000_000;
 
-      if (reloadListener != null) {
-        reloadListener.onReloadFailure(e, durationMs);
+      // Notify listener (capture reference to avoid race condition)
+      ReloadListener listener = this.reloadListener;
+      if (listener != null) {
+        listener.onReloadFailure(e, durationMs);
       }
 
       throw new IOException("Failed to reload rules: " + e.getMessage(), e);

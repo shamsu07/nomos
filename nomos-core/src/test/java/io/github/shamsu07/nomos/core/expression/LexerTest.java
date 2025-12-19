@@ -2,6 +2,7 @@ package io.github.shamsu07.nomos.core.expression;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -197,5 +198,60 @@ class LexerTest {
     assertEquals(TokenType.COMMA, tokens.get(3).getType());
     assertEquals(TokenType.IDENTIFIER, tokens.get(4).getType());
     assertEquals(TokenType.RIGHT_PAREN, tokens.get(5).getType());
+  }
+
+  @Test
+  void should_parseEscapedQuote_when_doubleQuoteString() {
+    List<Token> tokens = new Lexer("\"He said \\\"Hello\\\"\"").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("He said \"Hello\"", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_parseEscapedQuote_when_singleQuoteString() {
+    List<Token> tokens = new Lexer("'It\\'s working'").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("It's working", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_parseEscapedBackslash_when_present() {
+    List<Token> tokens = new Lexer("\"path\\\\to\\\\file\"").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("path\\to\\file", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_parseNewlineEscape_when_backslashN() {
+    List<Token> tokens = new Lexer("\"line1\\nline2\"").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("line1\nline2", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_parseTabEscape_when_backslashT() {
+    List<Token> tokens = new Lexer("\"col1\\tcol2\"").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("col1\tcol2", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_parseCarriageReturnEscape_when_backslashR() {
+    List<Token> tokens = new Lexer("\"text\\rmore\"").tokenize();
+    assertEquals(TokenType.STRING, tokens.get(0).getType());
+    assertEquals("text\rmore", tokens.get(0).getLiteral());
+  }
+
+  @Test
+  void should_throwException_when_invalidEscapeSequence() {
+    ParseException ex =
+        assertThrows(ParseException.class, () -> new Lexer("\"invalid\\x\"").tokenize());
+    // Message includes position info, just verify the key part
+    assertTrue(ex.getMessage().contains("Invalid escape sequence: \\x"));
+  }
+
+  @Test
+  void should_throwException_when_unterminatedEscapeSequence() {
+    assertThrows(ParseException.class, () -> new Lexer("\"trailing\\").tokenize());
   }
 }

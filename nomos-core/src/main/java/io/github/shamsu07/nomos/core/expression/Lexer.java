@@ -120,8 +120,15 @@ public final class Lexer {
   }
 
   private void string() {
+    StringBuilder value = new StringBuilder();
+
     while (peek() != '"' && !isAtEnd()) {
-      advance();
+      if (peek() == '\\') {
+        advance(); // consume backslash
+        value.append(processEscapeSequence());
+      } else {
+        value.append(advance());
+      }
     }
 
     if (isAtEnd()) {
@@ -131,14 +138,19 @@ public final class Lexer {
     // Closing "
     advance();
 
-    // Trim quotes
-    String value = source.substring(start + 1, current - 1);
-    addToken(TokenType.STRING, value);
+    addToken(TokenType.STRING, value.toString());
   }
 
   private void singleQuoteString() {
+    StringBuilder value = new StringBuilder();
+
     while (peek() != '\'' && !isAtEnd()) {
-      advance();
+      if (peek() == '\\') {
+        advance(); // consume backslash
+        value.append(processEscapeSequence());
+      } else {
+        value.append(advance());
+      }
     }
 
     if (isAtEnd()) {
@@ -148,9 +160,36 @@ public final class Lexer {
     // Closing '
     advance();
 
-    // Trim quotes
-    String value = source.substring(start + 1, current - 1);
-    addToken(TokenType.STRING, value);
+    addToken(TokenType.STRING, value.toString());
+  }
+
+  /**
+   * Process escape sequence after backslash has been consumed.
+   *
+   * @return The character represented by the escape sequence
+   */
+  private char processEscapeSequence() {
+    if (isAtEnd()) {
+      throw new ParseException("Unterminated escape sequence", current - 1);
+    }
+
+    char escaped = advance();
+    switch (escaped) {
+      case '"':
+        return '"';
+      case '\'':
+        return '\'';
+      case '\\':
+        return '\\';
+      case 'n':
+        return '\n';
+      case 't':
+        return '\t';
+      case 'r':
+        return '\r';
+      default:
+        throw new ParseException("Invalid escape sequence: \\" + escaped, current - 2);
+    }
   }
 
   private void number() {
