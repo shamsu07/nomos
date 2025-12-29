@@ -11,11 +11,14 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class FileWatcher implements AutoCloseable {
 
   private static final long DEFAULT_DEBOUNCE_DELAY_MS = 100;
+
+  // Bounded thread pool configuration to prevent thread explosion
+  private static final int CALLBACK_CORE_POOL_SIZE = 2;
+  private static final int CALLBACK_MAX_POOL_SIZE = 4;
+  private static final int CALLBACK_QUEUE_CAPACITY = 100;
+  private static final long CALLBACK_KEEP_ALIVE_SECONDS = 60;
 
   private final WatchService watchService;
   private final Map<Path, Runnable> watchedFiles;
@@ -67,13 +76,20 @@ public final class FileWatcher implements AutoCloseable {
               t.setDaemon(true);
               return t;
             });
+    // Bounded thread pool to prevent thread explosion under rapid file changes
     this.callbackExecutor =
-        Executors.newCachedThreadPool(
+        new ThreadPoolExecutor(
+            CALLBACK_CORE_POOL_SIZE,
+            CALLBACK_MAX_POOL_SIZE,
+            CALLBACK_KEEP_ALIVE_SECONDS,
+            TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(CALLBACK_QUEUE_CAPACITY),
             r -> {
               Thread t = new Thread(r, "nomos-callback");
               t.setDaemon(true);
               return t;
-            });
+            },
+            new CallerRunsOnShutdownPolicy());
     this.debounceScheduler =
         Executors.newScheduledThreadPool(
             1,
@@ -445,5 +461,21 @@ public final class FileWatcher implements AutoCloseable {
      * @param cause Optional exception that caused the stop, may be null
      */
     void onWatcherStopped(String reason, Throwable cause);
+  }
+
+  /**
+   * Rejection policy that runs the task in the caller's thread when the pool is saturated, but
+   * discards tasks if the executor is shutting down. This prevents task loss during normal
+   * operation while avoiding RejectedExecutionException during shutdown.
+   */
+  private static class CallerRunsOnShutdownPolicy implements RejectedExecutionHandler {
+    @Override
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+      if (!executor.isShutdown()) {
+        // Run in caller's thread to ensure task is not lost
+        r.run();
+      }
+      // If shutting down, silently discard the task
+    }
   }
 }
