@@ -18,19 +18,19 @@ Nomos is designed for developers who need a fast, simple rule engine without the
 <dependency>
     <groupId>io.github.shamsu07</groupId>
     <artifactId>nomos-core</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
 </dependency>
 
 ```
 
 ### Gradle
 ```kotlin
-implementation("io.github.shamsu07:nomos-core:0.0.1")
+implementation("io.github.shamsu07:nomos-core:1.0.0")
 ```
 
 ### Spring Boot Starter
 ```kotlin
-implementation("io.github.shamsu07:nomos-spring-boot-starter:0.0.1")
+implementation("io.github.shamsu07:nomos-spring-boot-starter:1.0.0")
 ```
 
 ---
@@ -95,23 +95,23 @@ Nomos is optimized for speed through:
 
 **Gradle (Kotlin DSL):**
 ```kotlin
-implementation("io.github.shamsu07.nomos:nomos-spring-boot-starter:0.0.1-SNAPSHOT")
+implementation("io.github.shamsu07:nomos-spring-boot-starter:1.0.0")
 ````
 
 **Maven:**
 
 ```xml
 <dependency>
-    <groupId>io.github.shamsu07.nomos</groupId>
+    <groupId>io.github.shamsu07</groupId>
     <artifactId>nomos-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
 For standalone usage:
 
 ```kotlin
-implementation("io.github.shamsu07.nomos:nomos-core:0.0.1-SNAPSHOT")
+implementation("io.github.shamsu07:nomos-core:1.0.0")
 ```
 
 ---
