@@ -47,3 +47,4 @@ public class JavaRuleDefinitions {
         engine.addRule(vipRule);
     }
 }
+```

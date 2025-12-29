@@ -25,3 +25,4 @@ facts = facts.put("discount.percent", 0.0); // Can set nested properties
 String email = facts.get("user.email", String.class); // "test@example.com"
 Double total = facts.get("cart.total", Double.class); // 150.0
 Double percent = facts.get("discount.percent", Double.class); // 0.0
+```

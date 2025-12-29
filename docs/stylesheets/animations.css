@@ -1,0 +1,387 @@
+/* =============================================================================
+   nomos Documentation - Animations & Transitions
+   Smooth, subtle animations for a polished user experience
+   ============================================================================= */
+
+/* =============================================================================
+   Keyframe Animations
+   ============================================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =============================================================================
+   Page Load Animations
+   ============================================================================= */
+
+.md-content__inner {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.md-main__inner {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* =============================================================================
+   Interaction Animations
+   ============================================================================= */
+
+/* Links - subtle underline animation */
+.md-typeset a:not(.md-button) {
+  position: relative;
+}
+
+.md-typeset a:not(.md-button)::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--nomos-primary);
+  transition: width var(--nomos-transition);
+}
+
+.md-typeset a:not(.md-button):hover::after {
+  width: 100%;
+}
+
+/* Button hover lift effect */
+.md-typeset .md-button {
+  transition: all var(--nomos-transition);
+}
+
+.md-typeset .md-button:hover {
+  transform: translateY(-2px);
+}
+
+.md-typeset .md-button:active {
+  transform: translateY(0);
+}
+
+/* Card hover animations */
+.feature-card {
+  transition: all var(--nomos-transition);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+}
+
+.feature-card__icon {
+  transition: all var(--nomos-transition);
+}
+
+.feature-card:hover .feature-card__icon {
+  transform: scale(1.1);
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* =============================================================================
+   Navigation Animations
+   ============================================================================= */
+
+/* Tab indicator slide */
+.md-tabs__link {
+  position: relative;
+}
+
+.md-tabs__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--nomos-primary);
+  transition: all var(--nomos-transition);
+  transform: translateX(-50%);
+}
+
+.md-tabs__link--active::after,
+.md-tabs__link:hover::after {
+  width: 100%;
+}
+
+/* Sidebar nav hover */
+.md-nav__link {
+  transition: all var(--nomos-transition-fast);
+}
+
+.md-nav__link:hover {
+  padding-left: calc(var(--nomos-space-sm) + 4px);
+}
+
+/* =============================================================================
+   Code Block Animations
+   ============================================================================= */
+
+/* Copy button feedback */
+.md-clipboard {
+  transition: all var(--nomos-transition-fast);
+}
+
+.md-clipboard:hover {
+  transform: scale(1.1);
+}
+
+.md-clipboard--copied {
+  animation: bounce 0.4s ease;
+}
+
+/* Code highlight on hover */
+.highlight:hover .filename {
+  background: var(--nomos-bg);
+}
+
+/* =============================================================================
+   Admonition Animations
+   ============================================================================= */
+
+.md-typeset .admonition,
+.md-typeset details {
+  transition: all var(--nomos-transition);
+}
+
+.md-typeset .admonition:hover,
+.md-typeset details:hover {
+  box-shadow: var(--nomos-shadow-md);
+}
+
+/* Details expand animation */
+.md-typeset details[open] > summary ~ * {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* =============================================================================
+   Table Animations
+   ============================================================================= */
+
+.md-typeset table:not([class]) tr {
+  transition: background var(--nomos-transition-fast);
+}
+
+/* =============================================================================
+   Search Animations
+   ============================================================================= */
+
+.md-search__form {
+  transition: all var(--nomos-transition);
+}
+
+.md-search__form:focus-within {
+  transform: scale(1.02);
+}
+
+.md-search-result__item {
+  animation: fadeInUp 0.2s ease-out;
+  animation-fill-mode: both;
+}
+
+.md-search-result__item:nth-child(1) { animation-delay: 0.05s; }
+.md-search-result__item:nth-child(2) { animation-delay: 0.1s; }
+.md-search-result__item:nth-child(3) { animation-delay: 0.15s; }
+.md-search-result__item:nth-child(4) { animation-delay: 0.2s; }
+.md-search-result__item:nth-child(5) { animation-delay: 0.25s; }
+
+/* =============================================================================
+   Hero Animations
+   ============================================================================= */
+
+.hero {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.hero__logo {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.hero__title {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.hero__subtitle {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.hero__actions {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.hero__badge {
+  animation: fadeIn 0.6s ease-out 0.4s both;
+}
+
+/* Feature cards stagger animation */
+.feature-card:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.1s both; }
+.feature-card:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.2s both; }
+.feature-card:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.3s both; }
+.feature-card:nth-child(4) { animation: fadeInUp 0.5s ease-out 0.4s both; }
+.feature-card:nth-child(5) { animation: fadeInUp 0.5s ease-out 0.5s both; }
+.feature-card:nth-child(6) { animation: fadeInUp 0.5s ease-out 0.6s both; }
+
+/* =============================================================================
+   Scroll Animations (for future use with JS)
+   ============================================================================= */
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================================================================
+   Loading States
+   ============================================================================= */
+
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--nomos-border);
+  border-top-color: var(--nomos-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* =============================================================================
+   Focus States (Accessibility)
+   ============================================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--nomos-primary);
+  outline-offset: 2px;
+}
+
+.md-typeset a:focus-visible {
+  outline: 2px solid var(--nomos-primary);
+  outline-offset: 2px;
+  border-radius: var(--nomos-radius-sm);
+}
+
+/* =============================================================================
+   Reduced Motion (Accessibility)
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
