@@ -126,16 +126,16 @@ rules:
     priority: 100
     when: "isVIP() && cartTotal() > 100"
     then:
-      discount.percent: 15
-      discount.reason: "VIP Member"
-      sendEmail: ["{{ user.email }}", "You got 15% off!"]
+      - discount.percent = 15
+      - discount.reason = "VIP Member"
+      - sendEmail: ["{{ user.email }}", "You got 15% off!"]
 
   - name: "Bulk Order Discount"
     priority: 90
     when: "itemCount() > 20"
     then:
-      discount.percent: 12
-      discount.reason: "Bulk Order"
+      - discount.percent = 12
+      - discount.reason = "Bulk Order"
 ```
 
 ---
@@ -250,8 +250,8 @@ Rule rule = Rule.builder()
         return "VIP".equals(user.getType()) && cart.getTotal() > 100;
     })
     .then(facts -> {
-        facts.put("discount.percent", 15.0);
-        facts.put("discount.reason", "VIP Member");
+        return facts.put("discount.percent", 15.0)
+                    .put("discount.reason", "VIP Member");
     })
     .build();
 
@@ -265,14 +265,14 @@ ruleEngine.addRule(rule);
 ```java
 RuleEngine.ExecutionResult result = ruleEngine.executeWithTrace(facts);
 
-System.out.println("Fired Rules: " + result.firedRuleCount());
+System.out.println("Fired Rules: " + result.getFiredRules().size());
 
-for (RuleEngine.RuleExecution exec : result.executionTrace()) {
-    System.out.printf("%s - %s (priority: %d)%n",
-        exec.ruleName(),
-        exec.fired() ? "FIRED" : "SKIPPED",
-        exec.priority());
+for (String ruleName : result.getFiredRules()) {
+    System.out.println("Fired: " + ruleName);
 }
+
+// Access the updated facts
+Facts updatedFacts = result.getFacts();
 ```
 
 ---

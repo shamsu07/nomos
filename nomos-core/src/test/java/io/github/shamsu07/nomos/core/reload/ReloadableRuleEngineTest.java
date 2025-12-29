@@ -136,8 +136,8 @@ class ReloadableRuleEngineTest {
     Facts result1 = engine.execute(new Facts());
     assertEquals(1.0, result1.get("counter"));
 
-    // Wait for watcher to start
-    Thread.sleep(200);
+    // Wait for watcher to fully start (WatchService registration can be slow)
+    Thread.sleep(500);
 
     // Modify file
     String yaml2 =
@@ -150,12 +150,19 @@ class ReloadableRuleEngineTest {
         """;
     Files.writeString(rulesFile, yaml2);
 
+    // Force a file modification timestamp update to ensure WatchService detects the
+    // change
+    // Some filesystems have low-resolution timestamps that might not detect rapid
+    // writes
+    Files.setLastModifiedTime(
+        rulesFile, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+
     // Wait for auto-reload
     boolean reloaded = reloadLatch.await(5, TimeUnit.SECONDS);
     assertTrue(reloaded, "Rules should be auto-reloaded");
 
-    // Give a bit more time for engine swap
-    Thread.sleep(100);
+    // Give more time for engine swap to complete
+    Thread.sleep(200);
 
     // Execute with new rules
     Facts result2 = engine.execute(new Facts());
