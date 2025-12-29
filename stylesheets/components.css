@@ -1,0 +1,633 @@
+/* =============================================================================
+   nomos Documentation - Component Styles
+   ============================================================================= */
+
+/* =============================================================================
+   Code Blocks
+   ============================================================================= */
+
+.md-typeset code {
+  font-family: var(--nomos-font-mono);
+  font-size: 0.875em;
+  font-weight: 400;
+  background: var(--nomos-bg-alt);
+  border: 1px solid var(--nomos-border-light);
+  border-radius: var(--nomos-radius-sm);
+  padding: 0.125em 0.375em;
+  color: var(--nomos-text);
+}
+
+.md-typeset pre {
+  background: var(--nomos-surface);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-md);
+  box-shadow: var(--nomos-shadow-sm);
+  overflow: hidden;
+}
+
+.md-typeset pre>code {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: var(--nomos-space-lg);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* Code copy button */
+.md-clipboard {
+  color: var(--nomos-text-muted);
+  transition: all var(--nomos-transition-fast);
+}
+
+.md-clipboard:hover {
+  color: var(--nomos-primary);
+}
+
+/* Code block header (filename) */
+.highlight .filename {
+  background: var(--nomos-bg-alt);
+  border-bottom: 1px solid var(--nomos-border-light);
+  padding: var(--nomos-space-sm) var(--nomos-space-md);
+  font-family: var(--nomos-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--nomos-text-secondary);
+}
+
+/* =============================================================================
+   Admonitions (Note, Warning, Tip, etc.)
+   ============================================================================= */
+
+.md-typeset .admonition,
+.md-typeset details {
+  background: var(--nomos-surface);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-md);
+  box-shadow: var(--nomos-shadow-sm);
+  overflow: hidden;
+  margin: var(--nomos-space-lg) 0;
+}
+
+.md-typeset .admonition-title,
+.md-typeset details summary {
+  background: var(--nomos-bg-alt);
+  border-bottom: 1px solid var(--nomos-border-light);
+  font-weight: 600;
+  padding: var(--nomos-space-sm) var(--nomos-space-md);
+}
+
+.md-typeset .admonition>.admonition-title::before,
+.md-typeset details>summary::before {
+  margin-right: var(--nomos-space-sm);
+}
+
+/* Note - Blue */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-left: 4px solid var(--nomos-info);
+}
+
+.md-typeset .admonition.note>.admonition-title,
+.md-typeset details.note>summary {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Tip - Green */
+.md-typeset .admonition.tip,
+.md-typeset details.tip,
+.md-typeset .admonition.hint,
+.md-typeset details.hint {
+  border-left: 4px solid var(--nomos-success);
+}
+
+.md-typeset .admonition.tip>.admonition-title,
+.md-typeset details.tip>summary,
+.md-typeset .admonition.hint>.admonition-title,
+.md-typeset details.hint>summary {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* Warning - Orange */
+.md-typeset .admonition.warning,
+.md-typeset details.warning,
+.md-typeset .admonition.caution,
+.md-typeset details.caution {
+  border-left: 4px solid var(--nomos-warning);
+}
+
+.md-typeset .admonition.warning>.admonition-title,
+.md-typeset details.warning>summary,
+.md-typeset .admonition.caution>.admonition-title,
+.md-typeset details.caution>summary {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* Danger - Red */
+.md-typeset .admonition.danger,
+.md-typeset details.danger,
+.md-typeset .admonition.error,
+.md-typeset details.error {
+  border-left: 4px solid var(--nomos-error);
+}
+
+.md-typeset .admonition.danger>.admonition-title,
+.md-typeset details.danger>summary,
+.md-typeset .admonition.error>.admonition-title,
+.md-typeset details.error>summary {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Example - Purple */
+.md-typeset .admonition.example,
+.md-typeset details.example {
+  border-left: 4px solid var(--nomos-primary);
+}
+
+.md-typeset .admonition.example>.admonition-title,
+.md-typeset details.example>summary {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* =============================================================================
+   Tables
+   ============================================================================= */
+
+.md-typeset table:not([class]) {
+  background: var(--nomos-surface);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-md);
+  overflow: hidden;
+  box-shadow: var(--nomos-shadow-sm);
+  font-size: 0.875rem;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--nomos-bg-alt);
+  font-weight: 600;
+  color: var(--nomos-text);
+  border-bottom: 2px solid var(--nomos-border);
+  padding: var(--nomos-space-sm) var(--nomos-space-md);
+}
+
+.md-typeset table:not([class]) td {
+  border-bottom: 1px solid var(--nomos-border-light);
+  padding: var(--nomos-space-sm) var(--nomos-space-md);
+}
+
+.md-typeset table:not([class]) tr:last-child td {
+  border-bottom: none;
+}
+
+.md-typeset table:not([class]) tr:hover td {
+  background: var(--nomos-bg-alt);
+}
+
+/* =============================================================================
+   Buttons (Custom)
+   ============================================================================= */
+
+.md-typeset .md-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nomos-space-sm);
+  padding: var(--nomos-space-sm) var(--nomos-space-lg);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: var(--nomos-radius);
+  transition: all var(--nomos-transition);
+  text-decoration: none !important;
+}
+
+.md-typeset .md-button--primary {
+  background: var(--nomos-primary);
+  color: white !important;
+  border: none;
+  box-shadow: var(--nomos-shadow-sm);
+}
+
+.md-typeset .md-button--primary:hover {
+  background: var(--nomos-primary-dark);
+  box-shadow: var(--nomos-shadow-md);
+  transform: translateY(-1px);
+}
+
+.md-typeset .md-button--secondary {
+  background: transparent;
+  color: var(--nomos-text) !important;
+  border: 1px solid var(--nomos-border);
+}
+
+.md-typeset .md-button--secondary:hover {
+  background: var(--nomos-bg-alt);
+  border-color: var(--nomos-primary);
+  color: var(--nomos-primary) !important;
+}
+
+/* =============================================================================
+   Feature Cards (for landing page)
+   ============================================================================= */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--nomos-space-md);
+  margin: var(--nomos-space-lg) 0;
+}
+
+.feature-card {
+  background: var(--nomos-surface);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-md);
+  padding: var(--nomos-space-lg);
+  transition: all var(--nomos-transition);
+}
+
+.feature-card:hover {
+  border-color: var(--nomos-primary-light);
+  box-shadow: var(--nomos-shadow-md);
+  transform: translateY(-2px);
+}
+
+.feature-card__icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: var(--nomos-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--nomos-space-sm);
+  font-size: 1.25rem;
+}
+
+.feature-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--nomos-space-xs);
+  color: var(--nomos-text);
+}
+
+.feature-card__description {
+  font-size: 0.875rem;
+  color: var(--nomos-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* =============================================================================
+   Hero Section (landing page)
+   ============================================================================= */
+
+.hero {
+  text-align: center;
+  padding: var(--nomos-space-xl) 0 var(--nomos-space-2xl);
+}
+
+.hero__logo {
+  height: 175px;
+  margin: 0 auto var(--nomos-space-md);
+}
+
+.hero__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--nomos-space-sm);
+  background: linear-gradient(135deg, var(--nomos-text) 0%, var(--nomos-text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__subtitle {
+  font-size: 1.0625rem;
+  color: var(--nomos-text-secondary);
+  max-width: 520px;
+  margin: 0 auto var(--nomos-space-lg);
+  line-height: 1.6;
+}
+
+.hero__actions {
+  display: flex;
+  gap: var(--nomos-space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nomos-space-xs);
+  background: var(--nomos-bg-alt);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-full);
+  padding: 0.2rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--nomos-text-secondary);
+  margin-bottom: var(--nomos-space-md);
+}
+
+.hero__badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--nomos-success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* =============================================================================
+   Code Tabs
+   ============================================================================= */
+
+.md-typeset .tabbed-set {
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-md);
+  overflow: hidden;
+  margin: var(--nomos-space-lg) 0;
+}
+
+.md-typeset .tabbed-labels {
+  background: var(--nomos-bg-alt);
+  border-bottom: 1px solid var(--nomos-border);
+}
+
+.md-typeset .tabbed-labels>label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--nomos-text-secondary);
+  padding: var(--nomos-space-sm) var(--nomos-space-md);
+  border-bottom: 2px solid transparent;
+  transition: all var(--nomos-transition-fast);
+}
+
+.md-typeset .tabbed-labels>label:hover {
+  color: var(--nomos-text);
+}
+
+.md-typeset .tabbed-set>input:checked+label {
+  color: var(--nomos-primary);
+  border-bottom-color: var(--nomos-primary);
+}
+
+.md-typeset .tabbed-content {
+  padding: 0;
+}
+
+.md-typeset .tabbed-content>.tabbed-block {
+  margin: 0;
+}
+
+.md-typeset .tabbed-content pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* =============================================================================
+   Keyboard Keys
+   ============================================================================= */
+
+.md-typeset kbd {
+  background: var(--nomos-bg-alt);
+  border: 1px solid var(--nomos-border);
+  border-bottom-width: 2px;
+  border-radius: var(--nomos-radius-sm);
+  padding: 0.1em 0.4em;
+  font-family: var(--nomos-font-sans);
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--nomos-text-secondary);
+}
+
+/* =============================================================================
+   Blockquotes
+   ============================================================================= */
+
+.md-typeset blockquote {
+  background: var(--nomos-bg-alt);
+  border-left: 4px solid var(--nomos-primary);
+  border-radius: 0 var(--nomos-radius) var(--nomos-radius) 0;
+  padding: var(--nomos-space-md) var(--nomos-space-lg);
+  margin: var(--nomos-space-lg) 0;
+  color: var(--nomos-text-secondary);
+}
+
+.md-typeset blockquote p {
+  margin: 0;
+}
+
+/* =============================================================================
+   Lists
+   ============================================================================= */
+
+.md-typeset ul,
+.md-typeset ol {
+  margin-left: var(--nomos-space-lg);
+}
+
+.md-typeset li {
+  margin-bottom: var(--nomos-space-xs);
+}
+
+.md-typeset li::marker {
+  color: var(--nomos-primary);
+}
+
+/* Task lists */
+.md-typeset .task-list-item {
+  list-style: none;
+  margin-left: 0;
+}
+
+.md-typeset .task-list-item input[type="checkbox"] {
+  margin-right: var(--nomos-space-sm);
+  accent-color: var(--nomos-primary);
+}
+
+/* =============================================================================
+   Horizontal Rules
+   ============================================================================= */
+
+.md-typeset hr {
+  border: none;
+  border-top: 1px solid var(--nomos-border-light);
+  margin: var(--nomos-space-2xl) 0;
+}
+
+/* =============================================================================
+   Images
+   ============================================================================= */
+
+.md-typeset img {
+  border-radius: var(--nomos-radius-md);
+  max-width: 100%;
+  height: auto;
+}
+
+.md-typeset img[align="center"] {
+  display: block;
+  margin: var(--nomos-space-lg) auto;
+}
+
+/* =============================================================================
+   Version Badge
+   ============================================================================= */
+
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nomos-space-xs);
+  background: linear-gradient(135deg, var(--nomos-primary) 0%, var(--nomos-primary-dark) 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25em 0.75em;
+  border-radius: var(--nomos-radius-full);
+}
+
+/* =============================================================================
+   Dark Mode Code Syntax Highlighting Improvements
+   ============================================================================= */
+
+[data-md-color-scheme="nomos-dark"] .md-typeset code {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-md-color-scheme="nomos-dark"] .md-typeset pre {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+[data-md-color-scheme="nomos-dark"] .md-typeset pre>code {
+  background: transparent;
+  color: #e2e8f0;
+}
+
+/* Syntax highlighting colors for dark mode */
+[data-md-color-scheme="nomos-dark"] .highlight .c,
+[data-md-color-scheme="nomos-dark"] .highlight .c1,
+[data-md-color-scheme="nomos-dark"] .highlight .cm {
+  color: #64748b;
+}
+
+/* Comments */
+
+[data-md-color-scheme="nomos-dark"] .highlight .k,
+[data-md-color-scheme="nomos-dark"] .highlight .kd,
+[data-md-color-scheme="nomos-dark"] .highlight .kn,
+[data-md-color-scheme="nomos-dark"] .highlight .kr {
+  color: #c084fc;
+}
+
+/* Keywords */
+
+[data-md-color-scheme="nomos-dark"] .highlight .s,
+[data-md-color-scheme="nomos-dark"] .highlight .s1,
+[data-md-color-scheme="nomos-dark"] .highlight .s2,
+[data-md-color-scheme="nomos-dark"] .highlight .sb,
+[data-md-color-scheme="nomos-dark"] .highlight .sc {
+  color: #86efac;
+}
+
+/* Strings */
+
+[data-md-color-scheme="nomos-dark"] .highlight .n,
+[data-md-color-scheme="nomos-dark"] .highlight .na,
+[data-md-color-scheme="nomos-dark"] .highlight .nb,
+[data-md-color-scheme="nomos-dark"] .highlight .nc,
+[data-md-color-scheme="nomos-dark"] .highlight .nd,
+[data-md-color-scheme="nomos-dark"] .highlight .ni,
+[data-md-color-scheme="nomos-dark"] .highlight .nl,
+[data-md-color-scheme="nomos-dark"] .highlight .nn,
+[data-md-color-scheme="nomos-dark"] .highlight .no,
+[data-md-color-scheme="nomos-dark"] .highlight .nv {
+  color: #93c5fd;
+}
+
+/* Names */
+
+[data-md-color-scheme="nomos-dark"] .highlight .nf,
+[data-md-color-scheme="nomos-dark"] .highlight .fm {
+  color: #fbbf24;
+}
+
+/* Function names */
+
+[data-md-color-scheme="nomos-dark"] .highlight .m,
+[data-md-color-scheme="nomos-dark"] .highlight .mi,
+[data-md-color-scheme="nomos-dark"] .highlight .mf,
+[data-md-color-scheme="nomos-dark"] .highlight .mh,
+[data-md-color-scheme="nomos-dark"] .highlight .mo {
+  color: #fb923c;
+}
+
+/* Numbers */
+
+[data-md-color-scheme="nomos-dark"] .highlight .o,
+[data-md-color-scheme="nomos-dark"] .highlight .ow {
+  color: #67e8f9;
+}
+
+/* Operators */
+
+[data-md-color-scheme="nomos-dark"] .highlight .p {
+  color: #cbd5e1;
+}
+
+/* Punctuation */
+
+[data-md-color-scheme="nomos-dark"] .highlight .nt {
+  color: #f472b6;
+}
+
+/* XML/HTML Tags */
+
+[data-md-color-scheme="nomos-dark"] .highlight .err {
+  color: #f87171;
+}
+
+/* Errors */
+
+/* Code block filename in dark mode */
+[data-md-color-scheme="nomos-dark"] .highlight .filename {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+/* Tabbed content in dark mode */
+[data-md-color-scheme="nomos-dark"] .md-typeset .tabbed-labels {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* =============================================================================
+   Responsive Adjustments
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .hero__title {
+    font-size: 2rem;
+  }
+
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .md-typeset h1 {
+    font-size: 1.75rem;
+  }
+
+  .md-typeset h2 {
+    font-size: 1.375rem;
+  }
+}

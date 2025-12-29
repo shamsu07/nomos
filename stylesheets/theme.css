@@ -1,0 +1,398 @@
+/* =============================================================================
+   nomos Documentation - Modern Theme
+   A clean, minimal, and friendly design system
+   ============================================================================= */
+
+/* =============================================================================
+   CSS Variables - Design Tokens
+   ============================================================================= */
+
+:root {
+  /* Brand Colors */
+  --nomos-primary: #6366F1;          /* Indigo - trust & innovation */
+  --nomos-primary-light: #818CF8;
+  --nomos-primary-dark: #4F46E5;
+  --nomos-accent: #F97316;           /* Warm orange - energy & action */
+  --nomos-accent-light: #FB923C;
+
+  /* Semantic Colors */
+  --nomos-success: #10B981;
+  --nomos-warning: #F59E0B;
+  --nomos-error: #EF4444;
+  --nomos-info: #3B82F6;
+
+  /* Neutrals - Light Mode */
+  --nomos-bg: #FAFAFA;
+  --nomos-bg-alt: #F4F4F5;
+  --nomos-surface: #FFFFFF;
+  --nomos-surface-hover: #F9FAFB;
+  --nomos-border: #E4E4E7;
+  --nomos-border-light: #F4F4F5;
+
+  /* Text Colors - Light Mode */
+  --nomos-text: #18181B;
+  --nomos-text-secondary: #52525B;
+  --nomos-text-muted: #A1A1AA;
+  --nomos-text-inverse: #FFFFFF;
+
+  /* Shadows */
+  --nomos-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --nomos-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --nomos-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --nomos-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --nomos-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Border Radius */
+  --nomos-radius-sm: 0.375rem;
+  --nomos-radius: 0.5rem;
+  --nomos-radius-md: 0.75rem;
+  --nomos-radius-lg: 1rem;
+  --nomos-radius-xl: 1.5rem;
+  --nomos-radius-full: 9999px;
+
+  /* Spacing */
+  --nomos-space-xs: 0.25rem;
+  --nomos-space-sm: 0.5rem;
+  --nomos-space-md: 1rem;
+  --nomos-space-lg: 1.5rem;
+  --nomos-space-xl: 2rem;
+  --nomos-space-2xl: 3rem;
+  --nomos-space-3xl: 4rem;
+
+  /* Transitions */
+  --nomos-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --nomos-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --nomos-transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography */
+  --nomos-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --nomos-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+/* =============================================================================
+   Light Theme (Default)
+   ============================================================================= */
+
+[data-md-color-scheme="nomos-light"] {
+  --md-primary-fg-color: var(--nomos-primary);
+  --md-primary-fg-color--light: var(--nomos-primary-light);
+  --md-primary-fg-color--dark: var(--nomos-primary-dark);
+  --md-primary-bg-color: var(--nomos-text-inverse);
+  --md-primary-bg-color--light: var(--nomos-surface);
+
+  --md-accent-fg-color: var(--nomos-accent);
+  --md-accent-fg-color--transparent: rgba(249, 115, 22, 0.1);
+  --md-accent-bg-color: var(--nomos-accent);
+
+  --md-default-fg-color: var(--nomos-text);
+  --md-default-fg-color--light: var(--nomos-text-secondary);
+  --md-default-fg-color--lighter: var(--nomos-text-muted);
+  --md-default-fg-color--lightest: rgba(0, 0, 0, 0.05);
+  --md-default-bg-color: var(--nomos-bg);
+  --md-default-bg-color--light: var(--nomos-surface);
+  --md-default-bg-color--lighter: var(--nomos-bg-alt);
+  --md-default-bg-color--lightest: var(--nomos-surface);
+
+  --md-code-fg-color: var(--nomos-text);
+  --md-code-bg-color: var(--nomos-bg-alt);
+  --md-code-hl-color: rgba(99, 102, 241, 0.1);
+
+  --md-typeset-color: var(--nomos-text);
+  --md-typeset-a-color: var(--nomos-primary);
+
+  --md-admonition-fg-color: var(--nomos-text);
+  --md-admonition-bg-color: var(--nomos-surface);
+
+  --md-footer-fg-color: var(--nomos-text-secondary);
+  --md-footer-fg-color--light: var(--nomos-text-muted);
+  --md-footer-fg-color--lighter: var(--nomos-text-muted);
+  --md-footer-bg-color: var(--nomos-bg-alt);
+  --md-footer-bg-color--dark: var(--nomos-bg);
+}
+
+/* =============================================================================
+   Dark Theme
+   ============================================================================= */
+
+[data-md-color-scheme="nomos-dark"] {
+  --nomos-bg: #1a1a2e;
+  --nomos-bg-alt: #16213e;
+  --nomos-surface: #1f2847;
+  --nomos-surface-hover: #2a3655;
+  --nomos-border: #3d4f6f;
+  --nomos-border-light: #2a3655;
+  --nomos-text: #F1F5F9;
+  --nomos-text-secondary: #CBD5E1;
+  --nomos-text-muted: #94A3B8;
+
+  --md-primary-fg-color: var(--nomos-primary-light);
+  --md-primary-fg-color--light: var(--nomos-primary);
+  --md-primary-fg-color--dark: var(--nomos-primary-dark);
+  --md-primary-bg-color: var(--nomos-surface);
+  --md-primary-bg-color--light: var(--nomos-bg-alt);
+
+  --md-accent-fg-color: var(--nomos-accent-light);
+  --md-accent-fg-color--transparent: rgba(251, 146, 60, 0.15);
+  --md-accent-bg-color: var(--nomos-accent);
+
+  --md-default-fg-color: var(--nomos-text);
+  --md-default-fg-color--light: var(--nomos-text-secondary);
+  --md-default-fg-color--lighter: var(--nomos-text-muted);
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.08);
+  --md-default-bg-color: var(--nomos-bg);
+  --md-default-bg-color--light: var(--nomos-surface);
+  --md-default-bg-color--lighter: var(--nomos-bg-alt);
+  --md-default-bg-color--lightest: var(--nomos-surface);
+
+  --md-code-fg-color: #E2E8F0;
+  --md-code-bg-color: #0f172a;
+  --md-code-hl-color: rgba(129, 140, 248, 0.2);
+
+  --md-typeset-color: var(--nomos-text);
+  --md-typeset-a-color: var(--nomos-primary-light);
+
+  --md-admonition-fg-color: var(--nomos-text);
+  --md-admonition-bg-color: var(--nomos-surface);
+
+  --md-footer-fg-color: var(--nomos-text-secondary);
+  --md-footer-fg-color--light: var(--nomos-text-muted);
+  --md-footer-fg-color--lighter: var(--nomos-text-muted);
+  --md-footer-bg-color: var(--nomos-bg-alt);
+  --md-footer-bg-color--dark: var(--nomos-bg);
+}
+
+/* =============================================================================
+   Base Styles
+   ============================================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--nomos-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =============================================================================
+   Typography
+   ============================================================================= */
+
+.md-typeset {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--nomos-text);
+}
+
+.md-typeset h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-top: 0;
+  color: var(--nomos-text);
+}
+
+.md-typeset h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin-top: var(--nomos-space-xl);
+  padding-bottom: var(--nomos-space-xs);
+  border-bottom: 1px solid var(--nomos-border-light);
+}
+
+.md-typeset h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  margin-top: var(--nomos-space-lg);
+}
+
+.md-typeset h4 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: var(--nomos-space-md);
+}
+
+.md-typeset p {
+  margin-bottom: var(--nomos-space-sm);
+}
+
+.md-typeset a {
+  color: var(--nomos-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--nomos-transition-fast);
+}
+
+.md-typeset a:hover {
+  color: var(--nomos-primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* =============================================================================
+   Header
+   ============================================================================= */
+
+.md-header {
+  background: var(--nomos-surface);
+  border-bottom: 1px solid var(--nomos-border);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.md-header[data-md-state="shadow"] {
+  box-shadow: var(--nomos-shadow);
+}
+
+.md-header__title {
+  font-weight: 600;
+  color: var(--nomos-text);
+}
+
+.md-header__button.md-logo {
+  padding: var(--nomos-space-xs);
+}
+
+.md-header__button.md-logo img {
+  height: 2rem;
+  width: auto;
+}
+
+/* =============================================================================
+   Navigation Tabs
+   ============================================================================= */
+
+.md-tabs {
+  background: var(--nomos-surface);
+  border-bottom: 1px solid var(--nomos-border-light);
+}
+
+.md-tabs__link {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--nomos-text-secondary);
+  opacity: 1;
+  transition: color var(--nomos-transition-fast);
+}
+
+.md-tabs__link:hover {
+  color: var(--nomos-primary);
+}
+
+.md-tabs__link--active {
+  color: var(--nomos-primary);
+  font-weight: 600;
+}
+
+/* =============================================================================
+   Sidebar
+   ============================================================================= */
+
+.md-sidebar {
+  background: transparent;
+}
+
+.md-sidebar__scrollwrap {
+  background: transparent;
+}
+
+.md-nav__link {
+  font-size: 0.875rem;
+  color: var(--nomos-text-secondary);
+  padding: var(--nomos-space-xs) var(--nomos-space-sm);
+  border-radius: var(--nomos-radius-sm);
+  margin: 2px 0;
+  transition: all var(--nomos-transition-fast);
+}
+
+.md-nav__link:hover {
+  color: var(--nomos-text);
+  background: var(--nomos-bg-alt);
+}
+
+.md-nav__link--active {
+  color: var(--nomos-primary);
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.md-nav__item--nested > .md-nav__link {
+  font-weight: 600;
+  color: var(--nomos-text);
+}
+
+/* =============================================================================
+   Search
+   ============================================================================= */
+
+.md-search__form {
+  background: var(--nomos-bg-alt);
+  border: 1px solid var(--nomos-border);
+  border-radius: var(--nomos-radius-full);
+  transition: all var(--nomos-transition);
+}
+
+.md-search__form:hover {
+  border-color: var(--nomos-primary-light);
+}
+
+.md-search__form:focus-within {
+  border-color: var(--nomos-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.md-search__input {
+  background: transparent;
+  font-size: 0.875rem;
+}
+
+.md-search__input::placeholder {
+  color: var(--nomos-text-muted);
+}
+
+/* =============================================================================
+   Content
+   ============================================================================= */
+
+.md-content {
+  max-width: 52rem;
+}
+
+.md-content__inner {
+  padding-top: var(--nomos-space-xl);
+  padding-bottom: var(--nomos-space-3xl);
+}
+
+/* =============================================================================
+   Footer
+   ============================================================================= */
+
+.md-footer {
+  background: var(--nomos-bg-alt);
+  border-top: 1px solid var(--nomos-border-light);
+}
+
+.md-footer__inner {
+  padding: var(--nomos-space-xl) 0;
+}
+
+.md-footer-meta {
+  background: transparent;
+}
+
+.md-social__link {
+  color: var(--nomos-text-muted);
+  transition: color var(--nomos-transition-fast);
+}
+
+.md-social__link:hover {
+  color: var(--nomos-primary);
+}
