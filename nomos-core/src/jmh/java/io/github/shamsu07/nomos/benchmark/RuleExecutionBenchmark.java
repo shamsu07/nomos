@@ -77,7 +77,7 @@ public class RuleExecutionBenchmark {
               - eligible = true
           - name: "Rule4"
             priority: 70
-            when: "city == \"NYC\""
+            when: 'city == "NYC"'
             then:
               - tax = 8.875
           - name: "Rule5"
@@ -97,7 +97,7 @@ public class RuleExecutionBenchmark {
               - senior = true
           - name: "Rule8"
             priority: 30
-            when: "city == \"LA\" || city == \"SF\""
+            when: 'city == "LA" || city == "SF"'
             then:
               - westCoast = true
           - name: "Rule9"
