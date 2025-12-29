@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 @AutoConfiguration
 @EnableConfigurationProperties(NomosProperties.class)
@@ -39,8 +40,17 @@ public class NomosAutoConfiguration {
       List<NomosConfigurer> configurers)
       throws IOException {
 
-    // Allow users to register custom functions/actions
+    // Sort configurers by order (supports both Ordered interface and @Order annotation)
+    configurers.sort(AnnotationAwareOrderComparator.INSTANCE);
+
+    // Allow users to register custom functions/actions in order
     for (NomosConfigurer configurer : configurers) {
+      if (logger.isDebugEnabled()) {
+        logger.debug(
+            "Executing NomosConfigurer: {} with order: {}",
+            configurer.getClass().getSimpleName(),
+            configurer.getOrder());
+      }
       configurer.configure(functionRegistry, actionRegistry);
     }
 
