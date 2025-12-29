@@ -520,6 +520,120 @@ class YAMLRuleLoaderTest {
     assertEquals(99, rules.get(1).getPriority()); // Truncated to int
   }
 
+  @Test
+  void should_throwException_when_assignmentKeyStartsWithDot() {
+    String yaml =
+        """
+            rules:
+              - name: "Invalid Key"
+                when: "true"
+                then:
+                  - .invalid = 10
+            """;
+
+    RuleParseException e =
+        assertThrows(RuleParseException.class, () -> loader.load(toInputStream(yaml)));
+    assertTrue(e.getMessage().contains("cannot start with '.'"));
+  }
+
+  @Test
+  void should_throwException_when_assignmentKeyEndsWithDot() {
+    String yaml =
+        """
+            rules:
+              - name: "Invalid Key"
+                when: "true"
+                then:
+                  - invalid. = 10
+            """;
+
+    RuleParseException e =
+        assertThrows(RuleParseException.class, () -> loader.load(toInputStream(yaml)));
+    assertTrue(e.getMessage().contains("cannot end with '.'"));
+  }
+
+  @Test
+  void should_throwException_when_assignmentKeyHasConsecutiveDots() {
+    String yaml =
+        """
+            rules:
+              - name: "Invalid Key"
+                when: "true"
+                then:
+                  - key..value = 10
+            """;
+
+    RuleParseException e =
+        assertThrows(RuleParseException.class, () -> loader.load(toInputStream(yaml)));
+    assertTrue(e.getMessage().contains("cannot contain consecutive dots"));
+  }
+
+  @Test
+  void should_throwException_when_assignmentKeySegmentStartsWithNumber() {
+    String yaml =
+        """
+            rules:
+              - name: "Invalid Key"
+                when: "true"
+                then:
+                  - key.1value = 10
+            """;
+
+    RuleParseException e =
+        assertThrows(RuleParseException.class, () -> loader.load(toInputStream(yaml)));
+    assertTrue(e.getMessage().contains("must start with letter or underscore"));
+  }
+
+  @Test
+  void should_throwException_when_assignmentKeySegmentHasInvalidChar() {
+    String yaml =
+        """
+            rules:
+              - name: "Invalid Key"
+                when: "true"
+                then:
+                  - key.val-ue = 10
+            """;
+
+    RuleParseException e =
+        assertThrows(RuleParseException.class, () -> loader.load(toInputStream(yaml)));
+    assertTrue(e.getMessage().contains("contains invalid character"));
+  }
+
+  @Test
+  void should_allowValidAssignmentKey_when_underscores() {
+    String yaml =
+        """
+            rules:
+              - name: "Valid Key"
+                when: "true"
+                then:
+                  - _private_value = 10
+            """;
+
+    List<Rule> rules = loader.load(toInputStream(yaml));
+    assertEquals(1, rules.size());
+    Facts result = rules.get(0).execute(new Facts());
+    assertEquals(10.0, result.get("_private_value"));
+  }
+
+  @Test
+  void should_allowValidAssignmentKey_when_nestedWithUnderscores() {
+    String yaml =
+        """
+            rules:
+              - name: "Valid Nested Key"
+                when: "true"
+                then:
+                  - user._internal.field_name = 10
+            """;
+
+    List<Rule> rules = loader.load(toInputStream(yaml));
+    assertEquals(1, rules.size());
+    Facts result = rules.get(0).execute(new Facts());
+    assertEquals(10.0, result.get("user._internal.field_name"));
+  }
+
   private InputStream toInputStream(String content) {
     return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
   }

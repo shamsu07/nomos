@@ -57,7 +57,7 @@ public final class YAMLRuleLoader {
       Map<String, Object> data = yaml.load(inputStream);
 
       if (data == null || !data.containsKey("rules")) {
-        throw new RuleParseException("YAML must contains 'rules' key");
+        throw new RuleParseException("YAML must contain 'rules' key");
       }
 
       List<Map<String, Object>> rulesData = (List<Map<String, Object>>) data.get("rules");
@@ -191,6 +191,9 @@ public final class YAMLRuleLoader {
       throw new RuleParseException("Assignment key cannot be empty", ruleName, lineNumber);
     }
 
+    // Validate key format
+    validateAssignmentKey(key, ruleName, lineNumber);
+
     if (valueExpression.isEmpty()) {
       throw new RuleParseException("Assignment value cannot be empty", ruleName, lineNumber);
     }
@@ -200,7 +203,7 @@ public final class YAMLRuleLoader {
       evaluator.parse(valueExpression);
     } catch (ParseException e) {
       throw new RuleParseException(
-          " Invalid assignment value expression" + e.getMessage(), ruleName, lineNumber, e);
+          "Invalid assignment value expression: " + e.getMessage(), ruleName, lineNumber, e);
     }
 
     return facts -> {
@@ -212,7 +215,7 @@ public final class YAMLRuleLoader {
   private Rule.Action parseFunctionCall(String actionString, String ruleName, int lineNumber) {
     // Parse as expression to extract function name and arguments
     try {
-      // Check iff it looks like a function call
+      // Check if it looks like a function call
       if (!actionString.contains("(") || !actionString.endsWith(")")) {
         throw new RuleParseException(
             "Invalid action syntax. Expected assignment 'key = value' or function call 'func(args)'",
@@ -260,7 +263,7 @@ public final class YAMLRuleLoader {
       return arguments;
     }
 
-    // Split by comma, respoecting nested parentheses, brackets, and quotes
+    // Split by comma, respecting nested parentheses, brackets, and quotes
     List<String> argTokens = splitArguments(argsString);
 
     for (String arg : argTokens) {
@@ -313,5 +316,56 @@ public final class YAMLRuleLoader {
     }
 
     return arguments;
+  }
+
+  private void validateAssignmentKey(String key, String ruleName, int lineNumber) {
+    // Key cannot start or end with a dot
+    if (key.startsWith(".")) {
+      throw new RuleParseException(
+          "Assignment key cannot start with '.': " + key, ruleName, lineNumber);
+    }
+    if (key.endsWith(".")) {
+      throw new RuleParseException(
+          "Assignment key cannot end with '.': " + key, ruleName, lineNumber);
+    }
+
+    // Key cannot contain consecutive dots
+    if (key.contains("..")) {
+      throw new RuleParseException(
+          "Assignment key cannot contain consecutive dots: " + key, ruleName, lineNumber);
+    }
+
+    // Validate each segment of the key
+    String[] segments = key.split("\\.");
+    for (String segment : segments) {
+      if (segment.isEmpty()) {
+        throw new RuleParseException(
+            "Assignment key contains empty segment: " + key, ruleName, lineNumber);
+      }
+
+      // Each segment must be a valid identifier (start with letter or underscore)
+      char first = segment.charAt(0);
+      if (!Character.isLetter(first) && first != '_') {
+        throw new RuleParseException(
+            String.format(
+                "Assignment key segment '%s' must start with letter or underscore: %s",
+                segment, key),
+            ruleName,
+            lineNumber);
+      }
+
+      // Remaining characters must be letters, digits, or underscores
+      for (int i = 1; i < segment.length(); i++) {
+        char c = segment.charAt(i);
+        if (!Character.isLetterOrDigit(c) && c != '_') {
+          throw new RuleParseException(
+              String.format(
+                  "Assignment key segment '%s' contains invalid character '%c': %s",
+                  segment, c, key),
+              ruleName,
+              lineNumber);
+        }
+      }
+    }
   }
 }

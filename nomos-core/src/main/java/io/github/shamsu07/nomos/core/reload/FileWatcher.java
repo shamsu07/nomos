@@ -37,6 +37,9 @@ public final class FileWatcher implements AutoCloseable {
   private final Map<Path, WatchKey> registeredDirectories;
   private final Map<Path, AtomicInteger> directoryRefCounts;
 
+  // Listener for watcher state changes
+  private volatile WatcherStateListener stateListener;
+
   public FileWatcher() throws IOException {
     this(DEFAULT_DEBOUNCE_DELAY_MS);
   }
@@ -302,55 +305,95 @@ public final class FileWatcher implements AutoCloseable {
   }
 
   private void watchLoop() {
-    while (running.get()) {
-      try {
-        WatchKey key = watchService.take();
+    String exitReason = null;
+    Throwable exitCause = null;
+    boolean gracefulExit = false;
 
-        for (WatchEvent<?> event : key.pollEvents()) {
-          WatchEvent.Kind<?> kind = event.kind();
+    try {
+      while (running.get()) {
+        try {
+          WatchKey key = watchService.take();
 
-          // Ignore overflow events
-          if (kind == StandardWatchEventKinds.OVERFLOW) {
-            continue;
+          for (WatchEvent<?> event : key.pollEvents()) {
+            WatchEvent.Kind<?> kind = event.kind();
+
+            // Ignore overflow events
+            if (kind == StandardWatchEventKinds.OVERFLOW) {
+              continue;
+            }
+
+            @SuppressWarnings("unchecked")
+            WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
+            Path filename = pathEvent.context();
+
+            // Get directory and full file path
+            Path directory = (Path) key.watchable();
+            Path absoluteDirectory = directory.toAbsolutePath();
+            Path fullPath = directory.resolve(filename).toAbsolutePath();
+
+            // Check for file-level callback first
+            Runnable fileCallback = watchedFiles.get(fullPath);
+            // Check for directory-level callback (for watchDirectory)
+            Runnable directoryCallback = watchedFiles.get(absoluteDirectory);
+
+            // Schedule file-level callback if present
+            if (fileCallback != null) {
+              scheduleCallback(fullPath, fileCallback);
+            }
+
+            // Schedule directory-level callback if present (and different from file
+            // callback)
+            if (directoryCallback != null && directoryCallback != fileCallback) {
+              scheduleCallback(absoluteDirectory, directoryCallback);
+            }
           }
 
-          @SuppressWarnings("unchecked")
-          WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
-          Path filename = pathEvent.context();
-
-          // Get directory and full file path
-          Path directory = (Path) key.watchable();
-          Path absoluteDirectory = directory.toAbsolutePath();
-          Path fullPath = directory.resolve(filename).toAbsolutePath();
-
-          // Check for file-level callback first
-          Runnable fileCallback = watchedFiles.get(fullPath);
-          // Check for directory-level callback (for watchDirectory)
-          Runnable directoryCallback = watchedFiles.get(absoluteDirectory);
-
-          // Schedule file-level callback if present
-          if (fileCallback != null) {
-            scheduleCallback(fullPath, fileCallback);
+          // Reset key to receive further events
+          boolean valid = key.reset();
+          if (!valid) {
+            Path watchedDir = (Path) key.watchable();
+            exitReason =
+                "Watch key became invalid for directory: "
+                    + watchedDir
+                    + ". The directory may have been deleted or become inaccessible.";
+            break;
           }
 
-          // Schedule directory-level callback if present (and different from file
-          // callback)
-          if (directoryCallback != null && directoryCallback != fileCallback) {
-            scheduleCallback(absoluteDirectory, directoryCallback);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          // Check if this was a graceful shutdown
+          if (!running.get()) {
+            gracefulExit = true;
+          } else {
+            exitReason = "File watcher thread was interrupted";
+            exitCause = e;
           }
-        }
-
-        // Reset key to receive further events
-        boolean valid = key.reset();
-        if (!valid) {
+          break;
+        } catch (ClosedWatchServiceException e) {
+          // This is expected when close() is called
+          gracefulExit = !running.get();
+          if (!gracefulExit) {
+            exitReason = "Watch service was closed unexpectedly";
+            exitCause = e;
+          }
           break;
         }
+      }
+    } finally {
+      // Always update running state when loop exits
+      running.set(false);
 
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        break;
-      } catch (ClosedWatchServiceException e) {
-        break;
+      // Notify listener if exit was unexpected
+      if (!gracefulExit && exitReason != null) {
+        System.err.println("FileWatcher stopped: " + exitReason);
+        WatcherStateListener listener = stateListener;
+        if (listener != null) {
+          try {
+            listener.onWatcherStopped(exitReason, exitCause);
+          } catch (Exception e) {
+            System.err.println("Error in watcher state listener: " + e.getMessage());
+          }
+        }
       }
     }
   }
@@ -373,5 +416,34 @@ public final class FileWatcher implements AutoCloseable {
   /** Get count of registered directories (for testing/debugging) */
   public int getRegisteredDirectoryCount() {
     return registeredDirectories.size();
+  }
+
+  /**
+   * Set a listener to be notified of watcher state changes.
+   *
+   * @param listener Listener to notify, or null to remove
+   */
+  public void setStateListener(WatcherStateListener listener) {
+    this.stateListener = listener;
+  }
+
+  /**
+   * Get the current state listener.
+   *
+   * @return Current listener, or null if none set
+   */
+  public WatcherStateListener getStateListener() {
+    return stateListener;
+  }
+
+  /** Listener interface for watcher state changes. */
+  public interface WatcherStateListener {
+    /**
+     * Called when the watcher stops unexpectedly.
+     *
+     * @param reason Description of why the watcher stopped
+     * @param cause Optional exception that caused the stop, may be null
+     */
+    void onWatcherStopped(String reason, Throwable cause);
   }
 }

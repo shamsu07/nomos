@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Immutable container for rule execution context. Supports nested property access via dto notation
- * (e.g., "user.address.city"). Thread-safe dut to immutability - modifications return new
+ * (e.g., "user.address.city"). Thread-safe due to immutability - modifications return new
  * instances.
  */
 public final class Facts {
@@ -77,7 +77,7 @@ public final class Facts {
    *
    * @param key Fact key (supports dot annotation)
    * @param type Expected type
-   * @return Value cast to type, or null if not foun
+   * @return Value cast to type, or null if not found
    */
   @SuppressWarnings("unchecked")
   public <T> T get(String key, Class<T> type) {
@@ -122,7 +122,7 @@ public final class Facts {
     return new HashMap<>(data);
   }
 
-  // Nested propery support - uses reflection for POJOs
+  // Nested property support - uses reflection for POJOs
   private void putNested(Map<String, Object> target, String path, Object value) {
     String[] parts = pathCache.computeIfAbsent(path, k -> k.split("\\.", 2));
     String firstkey = parts[0];
