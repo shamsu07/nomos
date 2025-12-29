@@ -65,8 +65,15 @@ public class NomosAutoConfiguration {
         logger.info(
             "Loaded {} rules from {}", engine.getRules().size(), properties.getRuleLocation());
       } catch (IOException e) {
-        logger.error("Failed to load rules from {}", properties.getRuleLocation(), e);
-        throw e;
+        if (properties.isFailOnLoadError()) {
+          logger.error("Failed to load rules from {}", properties.getRuleLocation(), e);
+          throw e;
+        } else {
+          logger.warn(
+              "Failed to load rules from {} - continuing with empty rule set: {}",
+              properties.getRuleLocation(),
+              e.getMessage());
+        }
       }
     }
 

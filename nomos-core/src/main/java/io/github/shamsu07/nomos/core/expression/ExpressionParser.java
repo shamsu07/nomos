@@ -125,7 +125,7 @@ public final class ExpressionParser {
   private Expression factor() {
     Expression expr = unary();
 
-    while (match(TokenType.MULTIPLY, TokenType.DIVIDE)) {
+    while (match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO)) {
       Token operator = previous();
       Expression right = unary();
       expr = new BinaryExpression(expr, operator.getType(), right);
@@ -135,7 +135,7 @@ public final class ExpressionParser {
   }
 
   private Expression unary() {
-    if (match(TokenType.NOT, TokenType.MINUS)) {
+    if (match(TokenType.NOT, TokenType.MINUS, TokenType.PLUS)) {
       Token operator = previous();
       Expression right = unary();
       return new UnaryExpression(operator.getType(), right);
