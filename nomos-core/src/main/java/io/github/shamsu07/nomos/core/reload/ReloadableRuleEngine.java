@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,6 +31,7 @@ public final class ReloadableRuleEngine implements AutoCloseable {
   private final boolean stopOnFirstAppliedRule;
 
   private volatile Path rulesPath;
+  private volatile String originalPath; // Keep original path for classpath resources
   private volatile ReloadListener reloadListener;
 
   public ReloadableRuleEngine(
@@ -63,6 +65,9 @@ public final class ReloadableRuleEngine implements AutoCloseable {
   public void loadRules(String path, boolean watchForChanges) throws IOException {
     Objects.requireNonNull(path, "Path cannot be null");
 
+    // Store original path for classpath resources
+    this.originalPath = path;
+
     // Resolve path (support classpath: prefix)
     Path resolvedPath = resolvePath(path);
     this.rulesPath = resolvedPath;
@@ -71,8 +76,21 @@ public final class ReloadableRuleEngine implements AutoCloseable {
     reload();
 
     // Setup file watching if requested
-    if (watchForChanges && Files.exists(resolvedPath)) {
-      fileWatcher.watch(resolvedPath, this::reloadSafe);
+    if (watchForChanges) {
+      if (resolvedPath == null) {
+        // Classpath resource inside JAR - warn that hot reload is not possible
+        System.err.println(
+            "WARNING: Hot reload requested for '"
+                + path
+                + "' but classpath resources inside JAR files cannot be watched. "
+                + "Hot reload will be disabled for this resource. "
+                + "To enable hot reload, use a file system path instead.");
+      } else if (Files.exists(resolvedPath)) {
+        fileWatcher.watch(resolvedPath, this::reloadSafe);
+      } else {
+        System.err.println(
+            "WARNING: Hot reload requested but resolved path does not exist: " + resolvedPath);
+      }
     }
   }
 
@@ -91,13 +109,13 @@ public final class ReloadableRuleEngine implements AutoCloseable {
    * @throws IOException if reload fails
    */
   public void reload() throws IOException {
-    if (rulesPath == null) {
+    if (originalPath == null) {
       throw new IllegalStateException("No rules path configured. Call loadRules() first.");
     }
 
     long startTime = System.nanoTime();
 
-    try (InputStream inputStream = Files.newInputStream(rulesPath)) {
+    try (InputStream inputStream = openRulesInputStream()) {
       List<Rule> rules = loader.load(inputStream);
 
       // Create new engine with loaded rules
@@ -181,21 +199,137 @@ public final class ReloadableRuleEngine implements AutoCloseable {
     fileWatcher.close();
   }
 
+  /**
+   * Validate the currently loaded rules. This method re-parses the rules from the configured path
+   * and checks that all referenced functions and actions exist.
+   *
+   * <p>Use this for fail-fast validation at startup to catch configuration errors early.
+   *
+   * @return ValidationResult containing any errors found
+   * @throws IOException if the rules file cannot be read
+   */
+  public ValidationResult validate() throws IOException {
+    if (originalPath == null) {
+      throw new IllegalStateException("No rules path configured. Call loadRules() first.");
+    }
+
+    List<String> errors = new ArrayList<>();
+
+    try (InputStream inputStream = openRulesInputStream()) {
+      // Attempt to load and parse all rules - this validates functions and actions exist
+      loader.load(inputStream);
+    } catch (Exception e) {
+      // Collect the error message
+      errors.add(e.getMessage());
+      Throwable cause = e.getCause();
+      while (cause != null) {
+        errors.add("  Caused by: " + cause.getMessage());
+        cause = cause.getCause();
+      }
+    }
+
+    return new ValidationResult(errors);
+  }
+
+  /** Result of rule validation. */
+  public static final class ValidationResult {
+    private final List<String> errors;
+
+    public ValidationResult(List<String> errors) {
+      this.errors = List.copyOf(errors);
+    }
+
+    /**
+     * Check if validation passed (no errors).
+     *
+     * @return true if validation passed
+     */
+    public boolean isValid() {
+      return errors.isEmpty();
+    }
+
+    /**
+     * Get list of validation errors.
+     *
+     * @return List of error messages (empty if valid)
+     */
+    public List<String> getErrors() {
+      return errors;
+    }
+
+    /**
+     * Get error count.
+     *
+     * @return Number of errors found
+     */
+    public int getErrorCount() {
+      return errors.size();
+    }
+
+    @Override
+    public String toString() {
+      if (errors.isEmpty()) {
+        return "ValidationResult[valid=true]";
+      }
+      return String.format("ValidationResult[valid=false, errors=%d: %s]", errors.size(), errors);
+    }
+  }
+
+  /**
+   * Opens an input stream for the configured rules path. Handles both filesystem paths and
+   * classpath resources.
+   *
+   * @return InputStream for the rules file
+   * @throws IOException if the resource cannot be opened
+   */
+  private InputStream openRulesInputStream() throws IOException {
+    // For classpath resources (JAR resources), use classloader
+    if (originalPath.startsWith("classpath:")) {
+      String resourcePath = originalPath.substring("classpath:".length());
+      InputStream stream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+      if (stream == null) {
+        throw new IOException("Classpath resource not found: " + resourcePath);
+      }
+      return stream;
+    }
+
+    // For filesystem paths, use rulesPath
+    if (rulesPath != null) {
+      return Files.newInputStream(rulesPath);
+    }
+
+    throw new IOException("Cannot open rules stream for: " + originalPath);
+  }
+
+  /**
+   * Resolves a path string to a filesystem Path. Returns null for classpath resources that cannot
+   * be resolved to a filesystem path (e.g., resources inside JAR files).
+   *
+   * @param path Path string (may have classpath: prefix)
+   * @return Resolved Path, or null if resource is inside a JAR
+   * @throws IOException if the resource is not found
+   */
   private Path resolvePath(String path) throws IOException {
     // Handle classpath: prefix
     if (path.startsWith("classpath:")) {
       String resourcePath = path.substring("classpath:".length());
 
-      // Try to find resource
+      // Verify resource exists
       var url = getClass().getClassLoader().getResource(resourcePath);
       if (url == null) {
         throw new IOException("Classpath resource not found: " + resourcePath);
       }
 
+      // Try to convert to filesystem path (works for file:// URLs, not for jar:// URLs)
       try {
-        return Paths.get(url.toURI());
+        if ("file".equals(url.getProtocol())) {
+          return Paths.get(url.toURI());
+        }
+        // For JAR resources, return null - hot reload not supported
+        return null;
       } catch (Exception e) {
-        throw new IOException("Cannot resolve classpath resource: " + resourcePath, e);
+        // Cannot convert to Path (likely a JAR resource) - return null
+        return null;
       }
     }
 

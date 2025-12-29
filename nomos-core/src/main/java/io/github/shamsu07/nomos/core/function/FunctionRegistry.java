@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Thread-safe registry for functions callable from rule conditions.
  *
  * <p>Uses MethodHandles for high-performance invocation. Supports both annotation-based
- * registration and manual lambda registraion.
+ * registration and manual lambda registration.
  *
  * <p>Functions are validated at registration time (fail-fast), not during execution.
  */

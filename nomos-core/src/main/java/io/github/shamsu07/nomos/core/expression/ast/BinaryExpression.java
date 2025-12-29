@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Represents a binary operation in an expression (e.g., "a + b", "x > 10", "p && q").
  *
- * <p>Supports logical, comparison, and arithmetic opertors.
+ * <p>Supports logical, comparison, and arithmetic operators.
  */
 public class BinaryExpression implements Expression {
 
