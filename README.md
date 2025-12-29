@@ -328,13 +328,32 @@ Run:
 ./gradlew jmh
 ```
 
-**Sample Results (i7-9750H):**
+**Sample Results (JDK 17, OpenJDK 64-Bit Server VM):**
 
+### Rule Execution
 ```
-Benchmark                                     Mode   Score     Units
-simpleRuleExecution                           thrpt  145234    ops/s
-complexRuleExecution                          thrpt  12456     ops/s
-reloadRules                                   avgt   38.234    ms
+Benchmark                                     Mode   Score        Units
+simpleRuleExecution                           thrpt  4,246,806    ops/s
+complexRuleExecution (10 rules)               thrpt  116,439      ops/s
+simpleRuleExecutionWithTrace                  thrpt  3,483,825    ops/s
+```
+
+### Hot Reload
+```
+Benchmark                                     Mode   Score        Units
+reloadRules                                   avgt   0.098        ms/op
+```
+
+### Expression Evaluation
+```
+Benchmark                                     Mode   Score        Units
+literalExpression                             thrpt  9,015,000    ops/s
+variableExpression                            thrpt  4,786,000    ops/s
+arithmeticExpression                          thrpt  3,182,000    ops/s
+comparisonExpression                          thrpt  2,612,000    ops/s
+functionCallExpression                        thrpt  2,870,000    ops/s
+logicalExpression                             thrpt  1,341,000    ops/s
+complexExpression                             thrpt  536,000      ops/s
 ```
 
 ---
