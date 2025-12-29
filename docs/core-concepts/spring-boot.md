@@ -63,3 +63,4 @@ public class RuleConfiguration {
     return new DiscountActions();
   }
 }
+```
