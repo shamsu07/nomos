@@ -66,6 +66,8 @@ public class BinaryExpression implements Expression {
         return multiply(leftValue, rightValue);
       case DIVIDE:
         return divide(leftValue, rightValue);
+      case MODULO:
+        return modulo(leftValue, rightValue);
       default:
         throw new IllegalArgumentException("Unsupported binary operator: " + operator);
     }
@@ -130,6 +132,18 @@ public class BinaryExpression implements Expression {
     }
     throw new IllegalArgumentException(
         "Cannot divide " + left.getClass() + " and " + right.getClass());
+  }
+
+  private Object modulo(Object left, Object right) {
+    if (left instanceof Number && right instanceof Number) {
+      double divisor = toDouble(right);
+      if (divisor == 0.0) {
+        throw new ArithmeticException("Modulo by zero");
+      }
+      return toDouble(left) % divisor;
+    }
+    throw new IllegalArgumentException(
+        "Cannot modulo " + left.getClass() + " and " + right.getClass());
   }
 
   private double toDouble(Object value) {

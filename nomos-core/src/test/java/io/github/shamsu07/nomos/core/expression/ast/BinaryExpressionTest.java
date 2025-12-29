@@ -57,6 +57,33 @@ class BinaryExpressionTest {
   }
 
   @Test
+  void should_performModulo_when_moduloOperator() {
+    BinaryExpression expr =
+        new BinaryExpression(
+            new LiteralExpression(17.0), TokenType.MODULO, new LiteralExpression(5.0));
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(2.0, result);
+  }
+
+  @Test
+  void should_throwException_when_moduloByZero() {
+    BinaryExpression expr =
+        new BinaryExpression(
+            new LiteralExpression(10.0), TokenType.MODULO, new LiteralExpression(0.0));
+    assertThrows(
+        ArithmeticException.class, () -> expr.evaluate(new Facts(), new FunctionRegistry()));
+  }
+
+  @Test
+  void should_throwException_when_moduloNonNumbers() {
+    BinaryExpression expr =
+        new BinaryExpression(
+            new LiteralExpression("text"), TokenType.MODULO, new LiteralExpression(5.0));
+    assertThrows(
+        IllegalArgumentException.class, () -> expr.evaluate(new Facts(), new FunctionRegistry()));
+  }
+
+  @Test
   void should_concatenateStrings_when_plusOperatorWithStrings() {
     BinaryExpression expr =
         new BinaryExpression(

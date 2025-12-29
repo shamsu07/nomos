@@ -14,6 +14,9 @@ public class NomosProperties {
   /** Stop after first matching rule fires */
   private boolean stopOnFirstAppliedRule = false;
 
+  /** Fail application startup if rules cannot be loaded (default: true for fail-fast behavior) */
+  private boolean failOnLoadError = true;
+
   public String getRuleLocation() {
     return ruleLocation;
   }
@@ -36,5 +39,13 @@ public class NomosProperties {
 
   public void setStopOnFirstAppliedRule(boolean stopOnFirstAppliedRule) {
     this.stopOnFirstAppliedRule = stopOnFirstAppliedRule;
+  }
+
+  public boolean isFailOnLoadError() {
+    return failOnLoadError;
+  }
+
+  public void setFailOnLoadError(boolean failOnLoadError) {
+    this.failOnLoadError = failOnLoadError;
   }
 }

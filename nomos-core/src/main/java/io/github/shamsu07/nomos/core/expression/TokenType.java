@@ -35,6 +35,7 @@ public enum TokenType {
   MINUS, // -
   MULTIPLY, // *
   DIVIDE, // /
+  MODULO, // %
 
   // Punctuation
   LEFT_PAREN, // (

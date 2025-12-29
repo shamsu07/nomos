@@ -29,6 +29,8 @@ public final class UnaryExpression implements Expression {
         return !toBoolean(value);
       case MINUS:
         return negate(value);
+      case PLUS:
+        return toNumber(value);
       default:
         throw new IllegalArgumentException("Unsupported unary operator: " + operator);
     }
@@ -46,6 +48,13 @@ public final class UnaryExpression implements Expression {
       return -((Number) value).doubleValue();
     }
     throw new IllegalArgumentException("Cannot negate " + value.getClass());
+  }
+
+  private Object toNumber(Object value) {
+    if (value instanceof Number) {
+      return ((Number) value).doubleValue();
+    }
+    throw new IllegalArgumentException("Cannot apply unary + to " + value.getClass());
   }
 
   public TokenType getOperator() {

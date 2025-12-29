@@ -73,7 +73,21 @@ class UnaryExpressionTest {
 
   @Test
   void should_throwException_when_unsupportedOperator() {
+    UnaryExpression expr = new UnaryExpression(TokenType.MULTIPLY, new LiteralExpression(42.0));
+    assertThrows(
+        IllegalArgumentException.class, () -> expr.evaluate(new Facts(), new FunctionRegistry()));
+  }
+
+  @Test
+  void should_returnNumber_when_plusOperator() {
     UnaryExpression expr = new UnaryExpression(TokenType.PLUS, new LiteralExpression(42.0));
+    Object result = expr.evaluate(new Facts(), new FunctionRegistry());
+    assertEquals(42.0, result);
+  }
+
+  @Test
+  void should_throwException_when_plusOnNonNumber() {
+    UnaryExpression expr = new UnaryExpression(TokenType.PLUS, new LiteralExpression("text"));
     assertThrows(
         IllegalArgumentException.class, () -> expr.evaluate(new Facts(), new FunctionRegistry()));
   }

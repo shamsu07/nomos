@@ -72,6 +72,9 @@ public final class Lexer {
       case '/':
         addToken(TokenType.DIVIDE);
         break;
+      case '%':
+        addToken(TokenType.MODULO);
+        break;
       case '!':
         addToken(match('=') ? TokenType.NOT_EQUAL : TokenType.NOT);
         break;
